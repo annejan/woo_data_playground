@@ -18,7 +18,7 @@ def extract_pdf_data(pdf_file_path):
             print(f"Document: {match.group()} on page: {page_number+1}")
         else:
             pix = page.get_pixmap(clip=rect)
-            pix.save(f"document-{match.group()}.png") 
+            pix.save(f"document-{page_number+1}.png") 
 
 
     # Close the PDF document
