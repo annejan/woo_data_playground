@@ -1,6 +1,9 @@
 import argparse
 import fitz  # PyMuPDFA
 import re
+import subprocess
+
+tess = "tesseract stdin stdout --psm 7 -l nld"
 
 # Function to extract structured data from a PDF file
 def extract_pdf_data(pdf_file_path):
@@ -18,7 +21,18 @@ def extract_pdf_data(pdf_file_path):
             print(f"Document: {match.group()} on page: {page_number+1}")
         else:
             pix = page.get_pixmap(clip=rect)
-            pix.save(f"document-{page_number+1}.png") 
+#            pix.save(f"page-{page_number+1}.png") 
+            rc = subprocess.run(
+                tess,  # the command
+                input=pix.tobytes("png"),  # the pixmap image
+                stdout=subprocess.PIPE,  # find the text here
+                shell=True,
+                stderr=subprocess.DEVNULL
+            )
+            text = rc.stdout.decode()  # convert to string
+            match = re.search(r'\d+[A-Za-z]*', text)
+            if match:
+                print(f"Document: {match.group()} on page: {page_number+1}")
 
 
     # Close the PDF document
