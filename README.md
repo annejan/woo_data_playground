@@ -48,6 +48,17 @@ python find_document_number.py <pdf_file> --viewbox -180 20 -20 120
 
 The script will extract document numbers from the PDF file and display the extracted information and page number on the terminal.
 
+Negative numbers for the viewbox coordinates offset the viewbox from the right and bottom edges of the page, rather than the left and top edges. This allows you to specify a rectangular region within the PDF page based on its distance from the right and bottom edges.
+
+## Example Output
+
+```
+Document: 1     on page: 1
+Document: 2     on page: 3
+Document: 2a    on page: 5
+Document: 3     on page: 7
+```
+
 ## License
 
 This package is open-source and released under the [European Union Public License version 1.2](https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12). You are free to use, modify, and distribute the package in accordance with the terms of the license.

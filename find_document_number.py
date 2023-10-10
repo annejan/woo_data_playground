@@ -52,13 +52,13 @@ def extract_pdf_data(pdf_file_path, viewbox):
                 text = extract_text_from_pdf(pdf_document, page_number, rect)
                 match = re.search(r"\d+[A-Za-z]*", text)
                 if match:
-                    print(f"Document: {match.group()} on page: {page_number + 1}")
+                    print(f"Document: {match.group()}\ton page: {page_number + 1}")
                 else:
                     pix = pdf_document[page_number].get_pixmap(clip=rect)
                     text = extract_text_from_image(pix.tobytes("png"))
                     match = re.search(r"\d+[A-Za-z]*", text)
                     if match:
-                        print(f"Document: {match.group()} on page: {page_number + 1}")
+                        print(f"Document: {match.group()}\ton page: {page_number + 1}")
     except Exception as e:
         print(f"An error occurred: {e}")
 
