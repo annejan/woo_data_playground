@@ -18,6 +18,12 @@ You can install the PyMuPDF library (fitz) using pip:
 pip install PyMuPDF
 ```
 
+or
+
+```bash
+pip install -r requirements.txt
+```
+
 ### Installing Tesseract OCR
 
 You need to install Tesseract OCR on your system. Visit the [Tesseract OCR GitHub page](https://github.com/tesseract-ocr/tesseract) for installation instructions specific to your operating system.
