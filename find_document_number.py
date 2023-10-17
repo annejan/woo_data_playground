@@ -97,13 +97,13 @@ def write_to_excel(output_data, output_file):
     """
     workbook = Workbook()
     sheet = workbook.active
-    sheet.title = "Document Numbers"
+    sheet.title = "Documents"
 
-    sheet["A1"] = "Document Number"
-    sheet["B1"] = "Page Number"
+    sheet["A1"] = "DocumentID"
+    sheet["B1"] = "Page"
 
-    for i, (doc_number, page_number) in enumerate(output_data, start=2):
-        sheet[f"A{i}"] = doc_number
+    for i, (doc_id, page_number) in enumerate(output_data, start=2):
+        sheet[f"A{i}"] = doc_id
         sheet[f"B{i}"] = page_number
 
     workbook.save(output_file)
@@ -139,15 +139,55 @@ def process_page(pdf_document, viewbox):
     return rect
 
 
-def extract_pdf_data(pdf_file_path, viewbox):
+def extract_number(id):
     """
-    Extract document numbers from a PDF file.
+    Extract the numeric part from a given string ID.
+
+    Args:
+        id (str): The input string containing numeric and non-numeric characters.
+
+    Returns:
+        int: The extracted numeric part of the input string.
+
+    Example:
+    ```
+    numeric_value = extract_number("12de")
+    print(numeric_value)  # Output: 12
+    ```
+
+    If no numeric part is found in the input string, the function returns None.
+    """
+    # Use regular expression to extract the numeric part
+    numeric_part = re.match(r'\d+', id)
+
+    # Check if a match was found
+    if numeric_part:
+        # Convert the numeric part to an integer
+        numeric_value = int(numeric_part.group())
+        return numeric_value
+
+
+def extract_pdf_data(pdf_file_path, viewbox, minumum, maximum):
+    """
+    Extract document numbers from a PDF file within a specified numeric range.
 
     Args:
         pdf_file_path (str): The path to the PDF file.
         viewbox (list): The viewbox coordinates [left, top, right, bottom].
+        minimum (int): The minimum numeric value to consider (inclusive).
+        maximum (int): The maximum numeric value to consider (inclusive).
+
     Returns:
-        list of tuples: A list containing tuples of (document_number, page_number) for each extracted document number.
+        list of tuples: A list containing tuples of (document_id, page_number) for each extracted document number.
+
+    Example:
+    ```
+    output_data = extract_pdf_data("example.pdf", [-180, 20, -20, 120], minimum=1, maximum=10)
+    for doc_id, page_number in output_data:
+        print(f"Document: {doc_id}\ton page: {page_number}")
+    ```
+
+    This function extracts document numbers from the PDF file, and only those within the specified numeric range (inclusive).
     """
     output_data = []
     try:
@@ -157,21 +197,90 @@ def extract_pdf_data(pdf_file_path, viewbox):
                 text = extract_text_from_pdf(pdf_document, page_number, rect)
                 match = re.search(r"\d+[A-Za-z]*", text)
                 if match:
-                    doc_number = match.group()
-                    output_data.append((doc_number, page_number + 1))
-                    print(f"Document: {doc_number}\ton page: {page_number + 1}")
+                    doc_id = match.group()
+                    number = extract_number(doc_id)
+                    if minumum <= number <= maximum:
+                        output_data.append((doc_id, page_number + 1))
+                        print(f"Document: {doc_id}\ton page: {page_number + 1}")
                 else:
                     pix = pdf_document[page_number].get_pixmap(clip=rect)
                     text = extract_text_from_image(pix.tobytes("png"))
                     match = re.search(r"\d+[A-Za-z]*", text)
                     if match:
-                        doc_number = match.group()
-                        output_data.append((doc_number, page_number + 1))
-                        print(f"Document: {match.group()}\ton page: {page_number + 1}")
+                        doc_id = match.group()
+                        number = extract_number(doc_id)
+                        if minumum <= number <= maximum:
+                            output_data.append((doc_id, page_number + 1))
+                            print(f"Document: {match.group()}\ton page: {page_number + 1}")
     except Exception as e:
         print(f"An error occurred: {e}")
 
     return output_data
+
+
+def analyse(output_data, minimum, maximum):
+    """
+    Analyse a list of document IDs for out-of-order and missing IDs within specified ranges.
+
+    Args:
+        output_data (list of tuples): A list containing tuples of (document_id, page_number).
+        minimum (int): The minimum document ID to consider (inclusive).
+        maximum (int): The maximum document ID to consider (inclusive).
+
+    Prints:
+        - Out-of-order document IDs within the specified range.
+        - Missing document IDs within the specified range.
+
+    Example Usage:
+    ```
+    output_data = [
+        ("1", 1),
+        ("2", 3),
+        ("2a", 5),
+        # ... (other document IDs)
+    ]
+    # Analyse within the range 1 to 10
+    analyse(output_data, minimum=1, maximum=10)
+    ```
+    """
+    # Extract document IDs
+    document_ids = [
+        re.match(r"(\d+)([A-Za-z]*)", doc_id).groups() for doc_id, _ in output_data
+    ]
+
+    # Initialize variables to track anomalies
+    out_of_order_ids = []
+    missing_ids = []
+
+    # Iterate through the sorted list to detect out-of-order and missing IDs
+    prev_id = (minimum - 1, "")
+    first = True
+    for doc_id, letter_part in document_ids:
+        numeric_part = int(doc_id)
+
+        if not first:
+            prev_numeric, prev_letter = prev_id
+
+            if numeric_part > prev_numeric + 1:
+                for missing_numeric in range(prev_numeric + 1, numeric_part):
+                    missing_ids.append(f"{missing_numeric}{letter_part}")
+                prev_id = (numeric_part, letter_part)
+            elif numeric_part > maximum or numeric_part < minimum or (
+                    numeric_part != prev_numeric + 1
+                    and not (numeric_part == prev_numeric and letter_part > prev_letter)
+            ):
+                out_of_order_ids.append(f"{numeric_part}{letter_part}")
+            else:
+                prev_id = (numeric_part, letter_part)
+        else:
+            prev_id = (numeric_part, letter_part)
+            first = False
+
+    # Report out-of-order and missing IDs
+    if out_of_order_ids:
+        print(f"Out-of-order document IDs: {', '.join(out_of_order_ids)}")
+    if missing_ids:
+        print(f"Missing document IDs: {', '.join(missing_ids)}")
 
 
 def main():
@@ -186,15 +295,30 @@ def main():
     - `pdf_file` (str): The path to the input PDF file.
     - `--viewbox` (list of float): Optionally, specify the viewbox as [left, top, right, bottom] for precise data extraction.
     - `--output-file` (str): Optionally, specify the output Excel file for saving the extracted data.
+    - `--analyse` or `--analyze` (optional): Analyse the extracted document IDs for out-of-order and missing IDs.
+    - `--minimum` or `--min` (int, optional): The minimum expected document ID. If not specified, it is set to the first extracted ID.
+    - `--maximum` or `--max` (int, optional): The maximum expected document ID.
 
     Usage:
     To extract document numbers from a PDF file, run this script from the command line with the following command:
 
     ```
-    python pdf_data_extractor.py <pdf_file> [--viewbox L T R B] [--output-file output.xlsx]
+    python pdf_data_extractor.py <pdf_file> [--viewbox L T R B] [--output-file output.xlsx] [--analyse] [--minimum MIN] [--maximum MAX]
     ```
 
     If the `--output-file` option is not provided, the script will default to saving the data in an Excel file named "output.xlsx."
+
+    If the `--analyse` option is used, the script will analyse the extracted document IDs for out-of-order and missing IDs within the specified range.
+    The range is defined by the `--minimum` and `--maximum` options.
+
+    Example Usage:
+    To extract document numbers from a PDF file and analyse for out-of-order and missing IDs within the range 1 to 20:
+
+    ```
+    python pdf_data_extractor.py <pdf_file> --analyse --minimum 1 --maximum 20
+    ```
+
+    If the `--minimum` and `--maximum` options are not provided, the script will use 1 as the minimum.
     """
     parser = argparse.ArgumentParser(
         description="Extract document numbers from a PDF file."
@@ -213,6 +337,27 @@ def main():
         required=False,
         help="Specify the output Excel file",
     )
+    parser.add_argument(
+        "--analyse",
+        "--analyze",
+        required=False,
+        action="store_true",
+        help="Analyse the data",
+    )
+    parser.add_argument(
+        "--minimum",
+        "--min",
+        type=int,
+        required=False,
+        help="Minimum expected documentID",
+    )
+    parser.add_argument(
+        "--maximum",
+        "--max",
+        type=int,
+        required=False,
+        help="Maximum expected documentID",
+    )
 
     args = parser.parse_args()
     pdf_file_path = args.pdf_file
@@ -222,7 +367,18 @@ def main():
 
     viewbox = args.viewbox if args.viewbox else [-180, 20, -20, 120]  # Default viewbox
 
-    output_data = extract_pdf_data(pdf_file_path, viewbox)
+    minimum = args.minimum
+    if not minimum:
+        minimum = 1
+    maximum = args.maximum
+    if not maximum:
+        maximum = 9999
+
+    output_data = extract_pdf_data(pdf_file_path, viewbox, minimum, maximum)
+
+    if output_data and args.analyse:
+        analyse(output_data, minimum, maximum)
+
     if output_data and args.output_file:
         write_to_excel(output_data, args.output_file)
         print(f"Data has been written to {args.output_file}")
