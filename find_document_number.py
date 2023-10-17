@@ -158,13 +158,12 @@ def extract_number(id):
     If no numeric part is found in the input string, the function returns None.
     """
     # Use regular expression to extract the numeric part
-    numeric_part = re.match(r'\d+', id)
+    numeric_part = re.match(r"\d+", id)
 
     # Check if a match was found
     if numeric_part:
         # Convert the numeric part to an integer
-        numeric_value = int(numeric_part.group())
-        return numeric_value
+        return int(numeric_part.group())
 
 
 def extract_pdf_data(pdf_file_path, viewbox, minumum, maximum):
@@ -211,7 +210,9 @@ def extract_pdf_data(pdf_file_path, viewbox, minumum, maximum):
                         number = extract_number(doc_id)
                         if minumum <= number <= maximum:
                             output_data.append((doc_id, page_number + 1))
-                            print(f"Document: {match.group()}\ton page: {page_number + 1}")
+                            print(
+                                f"Document: {match.group()}\ton page: {page_number + 1}"
+                            )
     except Exception as e:
         print(f"An error occurred: {e}")
 
@@ -265,9 +266,13 @@ def analyse(output_data, minimum, maximum):
                 for missing_numeric in range(prev_numeric + 1, numeric_part):
                     missing_ids.append(f"{missing_numeric}{letter_part}")
                 prev_id = (numeric_part, letter_part)
-            elif numeric_part > maximum or numeric_part < minimum or (
+            elif (
+                numeric_part > maximum
+                or numeric_part < minimum
+                or (
                     numeric_part != prev_numeric + 1
                     and not (numeric_part == prev_numeric and letter_part > prev_letter)
+                )
             ):
                 out_of_order_ids.append(f"{numeric_part}{letter_part}")
             else:
