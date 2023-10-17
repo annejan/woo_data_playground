@@ -82,7 +82,7 @@ python find_document_number.py <pdf_file> --output-file output.xlsx
 
 Optional: You can specify a range of acceptable document IDs using the `--min` and `--max` arguments. 
 This ensures that only document IDs within the specified range are considered.
-If not provided, the default range is from 1 to 9999.
+If not provided, the default range is from 1 to 99999999.
 
 Example:
 

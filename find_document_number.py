@@ -387,7 +387,7 @@ def main():
         minimum = 1
     maximum = args.maximum
     if not maximum:
-        maximum = 9999
+        maximum = 99999999
 
     output_data = extract_pdf_data(pdf_file_path, viewbox, minimum, maximum, args.dump)
 
