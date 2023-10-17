@@ -8,6 +8,7 @@ Before you can use this script, you need to have the following prerequisites ins
 
 - Python 3.x
 - PyMuPDF (fitz)
+- OpenPyXL
 - Tesseract OCR
 
 ### Installing PyMuPDF (fitz)
@@ -16,6 +17,7 @@ You can install the PyMuPDF library (fitz) using pip:
 
 ```bash
 pip install PyMuPDF
+pip install openpyxl
 ```
 
 or
@@ -64,6 +66,14 @@ Document: 1     on page: 1
 Document: 2     on page: 3
 Document: 2a    on page: 5
 Document: 3     on page: 7
+```
+
+## Saving to an Excel File
+
+You can also save the extracted document numbers and their corresponding page numbers to an Excel file by using the `--output-file` argument. For example:
+
+```bash
+python pdf_data_extractor.py <pdf_file> --output-file output.xlsx
 ```
 
 ## License

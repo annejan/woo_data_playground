@@ -9,7 +9,7 @@ Key Features:
 - Extract document numbers from PDF files with customizable viewboxes.
 - Utilizes PyMuPDF for PDF document handling and Tesseract OCR for image-based text extraction.
 - Supports specifying custom viewboxes for precise data extraction.
-- Provides clear command-line usage with options for specifying PDF files and viewboxes.
+- Provides clear command-line usage with options for specifying PDF files, viewboxes, and an output Excel file.
 
 Usage:
 1. Clone this repository or download the `pdf_data_extractor.py` script to your local machine.
@@ -30,9 +30,11 @@ For example:
    python pdf_data_extractor.py <pdf_file> --viewbox -180 20 -20 120
    ```
 
-The script will extract document numbers from the PDF file and display the extracted information along with the page number on the terminal.
+Optional: You can specify an output Excel file using the --output-file argument. If not provided, data will be saved to "output.xlsx."
 
-This package is open-source and released under the European Union Public License version 1.2. 
+The script will extract document numbers from the PDF file and display and/or save the extracted information in an Excel file.
+
+This package is open-source and released under the European Union Public License version 1.2.
 You are free to use, modify, and distribute the package in accordance with the terms of the license.
 
 For contributions, bug reports, or suggestions, please visit the project repository on GitHub.
@@ -42,6 +44,7 @@ import re
 import subprocess
 import os
 import fitz  # PyMuPDF
+from openpyxl import Workbook
 
 TESS_COMMAND = "tesseract stdin stdout --psm 7 -l nld"
 
@@ -62,7 +65,7 @@ def extract_text_from_image(image_bytes):
         stdout=subprocess.PIPE,
         shell=True,
         stderr=subprocess.DEVNULL,
-        check=False
+        check=False,
     )
     return rc.stdout.decode()
 
@@ -82,6 +85,28 @@ def extract_text_from_pdf(pdf_document, page_number, rect):
     page = pdf_document[page_number]
     text = page.get_textbox(rect)
     return text
+
+
+def write_to_excel(output_data, output_file):
+    """
+    Writes the extracted document numbers and their corresponding page numbers to an Excel file.
+
+    Args:
+        output_data (list of tuples): A list containing tuples of (document_number, page_number).
+        output_file (str): The path to the Excel file where the data will be written.
+    """
+    workbook = Workbook()
+    sheet = workbook.active
+    sheet.title = "Document Numbers"
+
+    sheet["A1"] = "Document Number"
+    sheet["B1"] = "Page Number"
+
+    for i, (doc_number, page_number) in enumerate(output_data, start=2):
+        sheet[f"A{i}"] = doc_number
+        sheet[f"B{i}"] = page_number
+
+    workbook.save(output_file)
 
 
 def process_page(pdf_document, viewbox):
@@ -121,7 +146,10 @@ def extract_pdf_data(pdf_file_path, viewbox):
     Args:
         pdf_file_path (str): The path to the PDF file.
         viewbox (list): The viewbox coordinates [left, top, right, bottom].
+    Returns:
+        list of tuples: A list containing tuples of (document_number, page_number) for each extracted document number.
     """
+    output_data = []
     try:
         with fitz.open(pdf_file_path) as pdf_document:
             for page_number in range(pdf_document.page_count):
@@ -129,20 +157,44 @@ def extract_pdf_data(pdf_file_path, viewbox):
                 text = extract_text_from_pdf(pdf_document, page_number, rect)
                 match = re.search(r"\d+[A-Za-z]*", text)
                 if match:
-                    print(f"Document: {match.group()}\ton page: {page_number + 1}")
+                    doc_number = match.group()
+                    output_data.append((doc_number, page_number + 1))
+                    print(f"Document: {doc_number}\ton page: {page_number + 1}")
                 else:
                     pix = pdf_document[page_number].get_pixmap(clip=rect)
                     text = extract_text_from_image(pix.tobytes("png"))
                     match = re.search(r"\d+[A-Za-z]*", text)
                     if match:
+                        doc_number = match.group()
+                        output_data.append((doc_number, page_number + 1))
                         print(f"Document: {match.group()}\ton page: {page_number + 1}")
     except Exception as e:
         print(f"An error occurred: {e}")
+
+    return output_data
 
 
 def main():
     """
     Parse command-line arguments and execute the PDF data extraction process.
+
+    This function parses command-line arguments to specify the input PDF file and, optionally, a custom viewbox.
+    It then calls the `extract_pdf_data` function to extract document numbers from the PDF file and display or save them
+    in an Excel file if specified.
+
+    Command-Line Arguments:
+    - `pdf_file` (str): The path to the input PDF file.
+    - `--viewbox` (list of float): Optionally, specify the viewbox as [left, top, right, bottom] for precise data extraction.
+    - `--output-file` (str): Optionally, specify the output Excel file for saving the extracted data.
+
+    Usage:
+    To extract document numbers from a PDF file, run this script from the command line with the following command:
+
+    ```
+    python pdf_data_extractor.py <pdf_file> [--viewbox L T R B] [--output-file output.xlsx]
+    ```
+
+    If the `--output-file` option is not provided, the script will default to saving the data in an Excel file named "output.xlsx."
     """
     parser = argparse.ArgumentParser(
         description="Extract document numbers from a PDF file."
@@ -154,7 +206,12 @@ def main():
         type=float,
         required=False,
         help="Specify the viewbox as left top right bottom (e.g., --viewbox -180 20 -20 180)",
-        metavar=('L', 'T', 'R', 'B')
+        metavar=("L", "T", "R", "B"),
+    )
+    parser.add_argument(
+        "--output-file",
+        required=False,
+        help="Specify the output Excel file",
     )
 
     args = parser.parse_args()
@@ -165,7 +222,10 @@ def main():
 
     viewbox = args.viewbox if args.viewbox else [-180, 20, -20, 120]  # Default viewbox
 
-    extract_pdf_data(pdf_file_path, viewbox)
+    output_data = extract_pdf_data(pdf_file_path, viewbox)
+    if output_data and args.output_file:
+        write_to_excel(output_data, args.output_file)
+        print(f"Data has been written to {args.output_file}")
 
 
 if __name__ == "__main__":
