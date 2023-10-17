@@ -1,6 +1,7 @@
 import os
 import requests
 from bs4 import BeautifulSoup
+import csv
 
 
 def get_json_data(json_url):
@@ -61,11 +62,16 @@ def main():
     if data:
         if len(data.get("results", [])) == data.get("totalcount", 0):
             link_title_pairs = {}
-            for result in data.get("results", []):
-                pub = result.get("link").lstrip("#")
-                title = result.get("publication", {}).get("title")
-                if pub and title:
-                    link_title_pairs[pub] = title
+            with open("titles.csv", "w") as csvfile:
+                fieldnames = ["Link", "Title"]
+                writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+                writer.writeheader()  # Write the header row
+                for result in data.get("results", []):
+                    pub = result.get("link").lstrip("#")
+                    title = result.get("publication", {}).get("title")
+                    if pub and title:
+                        link_title_pairs[pub] = title
+                        writer.writerow({"Link": pub, "Title": title})
 
             for pub, title in link_title_pairs.items():
                 print(f"Link: {pub}, Title: {title}")
