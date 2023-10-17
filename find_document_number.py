@@ -70,7 +70,7 @@ def extract_text_from_image(image_bytes):
     return rc.stdout.decode()
 
 
-def extract_text_from_pdf(pdf_document, page_number, rect):
+def extract_text_from_pdf(pdf_document, page_number, rect, dump):
     """
     Extract text from a specified region of a PDF page.
 
@@ -84,6 +84,9 @@ def extract_text_from_pdf(pdf_document, page_number, rect):
     """
     page = pdf_document[page_number]
     text = page.get_textbox(rect)
+    if dump:
+        pix = page.get_pixmap(clip=rect)
+        pix.save(f"{page_number:04d}.png")
     return text
 
 
@@ -166,7 +169,7 @@ def extract_number(id):
         return int(numeric_part.group())
 
 
-def extract_pdf_data(pdf_file_path, viewbox, minumum, maximum):
+def extract_pdf_data(pdf_file_path, viewbox, minumum, maximum, dump):
     """
     Extract document numbers from a PDF file within a specified numeric range.
 
@@ -175,6 +178,7 @@ def extract_pdf_data(pdf_file_path, viewbox, minumum, maximum):
         viewbox (list): The viewbox coordinates [left, top, right, bottom].
         minimum (int): The minimum numeric value to consider (inclusive).
         maximum (int): The maximum numeric value to consider (inclusive).
+        dump (bool): Dump images as {page_number}.png
 
     Returns:
         list of tuples: A list containing tuples of (document_id, page_number) for each extracted document number.
@@ -193,7 +197,7 @@ def extract_pdf_data(pdf_file_path, viewbox, minumum, maximum):
         with fitz.open(pdf_file_path) as pdf_document:
             for page_number in range(pdf_document.page_count):
                 rect = process_page(pdf_document, viewbox)
-                text = extract_text_from_pdf(pdf_document, page_number, rect)
+                text = extract_text_from_pdf(pdf_document, page_number, rect, dump)
                 match = re.search(r"\d+[A-Za-z]*", text)
                 if match:
                     doc_id = match.group()
@@ -363,6 +367,12 @@ def main():
         required=False,
         help="Maximum expected documentID",
     )
+    parser.add_argument(
+        "--dump",
+        required=False,
+        action="store_true",
+        help="Dump the viewports as {pagenumber}.png",
+    )
 
     args = parser.parse_args()
     pdf_file_path = args.pdf_file
@@ -379,7 +389,7 @@ def main():
     if not maximum:
         maximum = 9999
 
-    output_data = extract_pdf_data(pdf_file_path, viewbox, minimum, maximum)
+    output_data = extract_pdf_data(pdf_file_path, viewbox, minimum, maximum, args.dump)
 
     if output_data and args.analyse:
         analyse(output_data, minimum, maximum)
