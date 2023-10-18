@@ -124,7 +124,7 @@ You can customize the script for your specific use case:
 
 ## Warning
 
-This script downloads approximately 90 Gigabytes of PDF files in its default configuration!
+This script downloads approximately 80 Gigabytes of PDF files in its default configuration!
 
 1. Open the script in a text editor and configure the following variables:
    - `json_url`: The URL of the JSON data source.
