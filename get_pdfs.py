@@ -1,23 +1,67 @@
+"""
+PDF Downloader and Data Extraction Script
+
+This script retrieves JSON data from a specified URL, extracts link-title pairs from the data,
+downloads associated PDF files, creates folders, and saves title information to a CSV file.
+It utilizes the requests library to make web requests, BeautifulSoup for HTML parsing,
+and csv for working with CSV files.
+
+Usage:
+    - Modify the 'json_url' variable to specify the JSON data source URL.
+    - Run the script to download PDFs, create folders, and save title information to CSV.
+
+Example Usage:
+    python script_name.py
+"""
 import os
 import requests
-from bs4 import BeautifulSoup
 import csv
+from bs4 import BeautifulSoup
 
 
 def get_json_data(json_url):
+    """
+    Get JSON data from a given URL.
+
+    Args:
+        json_url (str): The URL of the JSON data.
+
+    Returns:
+        dict or None: The JSON data or None if there was an error.
+
+    Example Usage:
+    ```
+    data = get_json_data("https://example.com/data.json")
+    ```
+    """
     try:
         response = requests.get(json_url)
         if response.status_code == 200:
             return response.json()
         else:
             print(f"Failed to retrieve JSON data. Status code: {response.status_code}")
-            return None
     except requests.exceptions.RequestException as e:
         print(f"An error occurred: {e}")
-        return None
+    return None
 
 
 def get_pdf_links_from_webpage(url):
+    """
+    Get PDF links from a webpage.
+
+    Args:
+        url (str): The URL of the webpage to scrape.
+
+    Returns:
+        list: A list of PDF links found on the webpage.
+
+    Example Usage:
+    ```
+    pdf_links = get_pdf_links_from_webpage("https://example.com/some-page/")
+    for link in pdf_links:
+        print(link)
+    ```
+    """
     pdfs = []
     try:
         response = requests.get(url)
@@ -42,6 +86,18 @@ def get_pdf_links_from_webpage(url):
 
 
 def download_pdf(url, save_path):
+    """
+    Download a PDF file from a URL and save it to a local path.
+
+    Args:
+        url (str): The URL of the PDF file.
+        save_path (str): The local path to save the downloaded PDF.
+
+    Example Usage:
+    ```
+    download_pdf("https://example.com/document.pdf", "local/path/document.pdf")
+    ```
+    """
     try:
         response = requests.get(url)
         if response.status_code == 200:
@@ -55,6 +111,12 @@ def download_pdf(url, save_path):
 
 
 def main():
+    """
+    Main function for downloading PDFs and associated data from a web source.
+
+    It retrieves JSON data from a specified URL, processes it to extract link-title pairs,
+    downloads associated PDFs, creates folders, and saves title information to a CSV file.
+    """
     base_url = "https://wobcovid19.rijksoverheid.nl/publicaties/"
     json_url = "https://do-ams3-17.hw.webhare.net/services/wobcovid19-prod-v2-1/search/?first=0&count=300&orderby=publicationdate"
     data = get_json_data(json_url)
