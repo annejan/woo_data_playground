@@ -142,9 +142,15 @@ def main():
                 with open(f"{pub}/title.txt", "w") as file:
                     file.write(title)
                 pdf_links = get_pdf_links_from_webpage(f"{base_url}{pub}/")
-                for pdf in pdf_links:
-                    pdf_url = f"{base_url}{pub}/{pdf}"
-                    download_pdf(pdf_url, f"{pub}/{pdf}")
+                with open(f"{pub}/pdfs.txt", "w") as file:
+                    for pdf in pdf_links:
+                        pdf_url = f"{base_url}{pub}/{pdf}"
+                        pdf_path = f"{pub}/{pdf}"
+                        file.write(pdf_url + "\n")
+                        if not os.path.exists(pdf_path) and not os.path.exists(
+                            "{pub}/skip"
+                        ):
+                            download_pdf(pdf_url, pdf_path)
         else:
             print(
                 "The result count does not match the totalcount, please fix json_url."
