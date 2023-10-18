@@ -44,9 +44,9 @@ To use this script, follow these steps:
 
 4. Run the script with the following command, replacing `<pdf_file>` with the path to your PDF file:
 
-```bash
-python find_document_number.py <pdf_file>
-```
+    ```bash
+    python find_document_number.py <pdf_file>
+    ```
 
 Optional: You can specify a custom viewbox using the `--viewbox` argument. The viewbox should be provided as four floating-point numbers separated by spaces (left top right bottom).
 
@@ -80,7 +80,7 @@ python find_document_number.py <pdf_file> --output-file output.xlsx
 
 ## Document ID range
 
-Optional: You can specify a range of acceptable document IDs using the `--min` and `--max` arguments. 
+Optional: You can specify a range of acceptable document IDs using the `--min` and `--max` arguments.
 This ensures that only document IDs within the specified range are considered.
 If not provided, the default range is from 1 to 99999999.
 
@@ -103,6 +103,46 @@ Document: 33    on page: 13
 Out-of-order document IDs: 28
 Missing document IDs: 31
 ```
+
+## PDF Downloader and Data Extraction Script
+
+This Python script is designed to download PDF files from a specific webpage, extract link-title pairs from JSON data, and organize the downloaded PDFs into folders. It can be used to automate the retrieval of PDF documents from a web source and store them locally.
+
+- Required Python libraries: requests and BeautifulSoup. You can install them using pip:
+
+```bash
+pip install requests beautifulsoup4
+```
+
+## Customization
+
+You can customize the script for your specific use case:
+
+- Modify the `json_url` and `base_url` variables to point to your data source and web source.
+- Customize the naming of folders and files as per your requirements.
+- Extend the functionality to handle additional data processing or tasks.
+
+## Warning
+
+This script downloads approximately 90 Gigabytes of PDF files in its default configuration!
+
+1. Open the script in a text editor and configure the following variables:
+   - `json_url`: The URL of the JSON data source.
+   - `base_url`: The base URL of the web source containing PDF links.
+2. Run the script by executing the following command in your terminal:
+
+```bash
+python script_name.py
+```
+
+The script will retrieve JSON data, process it, and download PDFs into folders based on the retrieved data.
+
+## Script Overview
+
+- The script retrieves JSON data from a specified URL using the `requests` library.
+- It extracts link-title pairs from the JSON data and saves them in a CSV file.
+- For each link-title pair, the script creates a folder and saves the title information in a text file.
+- It also downloads associated PDF files and saves them in the corresponding folders.
 
 ## License
 
