@@ -148,7 +148,7 @@ def main():
                         pdf_path = f"{pub}/{pdf}"
                         file.write(pdf_url + "\n")
                         if not os.path.exists(pdf_path) and not os.path.exists(
-                            "{pub}/skip"
+                            f"{pub}/skip"
                         ):
                             download_pdf(pdf_url, pdf_path)
         else:
