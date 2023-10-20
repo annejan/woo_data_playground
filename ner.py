@@ -1,5 +1,25 @@
+"""
+ner.py
+
+This script reads a PDF file, performs Named Entity Recognition (NER) using Flair, and extracts named entities with a specified certainty level.
+It can write the results to an Excel file, a CSV file, or print them to the console.
+
+Usage:
+    python ner.py <pdf_file> [--cuda] [--certainty <certainty>] [--output-excel <output_excel>] [--output-csv <output_csv>]
+
+Arguments:
+    pdf/file: Path to the PDF file to read and analyze for named entities.
+    --cuda: (Optional) Use CUDA for NER (if available).
+    --certainty: (Optional) Minimum certainty for entities (default: 0.9).
+    --output-excel: (Optional) Path to the output Excel file.
+    --output-csv: (Optional) Path to the output CSV file.
+
+Example:
+    python ner.py document.pdf --cuda --certainty 0.8 --output-excel entities.xlsx --output-csv entities.csv
+"""
 import argparse
 import csv
+import os
 import fitz  # PyMuPDF
 import flair
 import torch
@@ -8,7 +28,7 @@ from flair.models import SequenceTagger
 from openpyxl import Workbook
 
 
-def get_entities_with_certainty(pdf_file, certainty):
+def get_entities_with_certainty(pdf_file, certainty, tagger):
     entity_info = {}
     doc = fitz.open(pdf_file)
     for page_num in range(len(doc)):
@@ -50,7 +70,7 @@ def write_to_csv(sorted_entities, output_file):
             writer.writerow([entity_text, info["tag"], info["count"]])
 
 
-if __name__ == "__main__":
+def main():
     parser = argparse.ArgumentParser(
         description="Read a PDF file and perform Named Entity Recognition (NER)."
     )
@@ -75,12 +95,17 @@ if __name__ == "__main__":
         help="Path to the output CSV file.",
     )
     args = parser.parse_args()
+    pdf_file_path = args.pdf_file
+    if not os.path.isfile(pdf_file_path):
+        print(f"Error: The specified PDF file '{pdf_file_path}' does not exist.")
+        return
+
     if args.cuda:
         flair.device = torch.device("cuda")
     else:
         flair.device = torch.device("cpu")
     tagger = SequenceTagger.load("flair/ner-dutch-large")
-    entity_info = get_entities_with_certainty(args.pdf_file, args.certainty)
+    entity_info = get_entities_with_certainty(args.pdf_file, args.certainty, tagger)
     sorted_entities = sorted(
         entity_info.items(), key=lambda x: x[1]["count"], reverse=True
     )
@@ -99,3 +124,7 @@ if __name__ == "__main__":
     if args.output_csv:
         write_to_csv(sorted_entities, args.output_csv)
         print(f"Data has been written to {args.output_csv}")
+
+
+if __name__ == "__main__":
+    main()

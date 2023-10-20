@@ -7,10 +7,10 @@ Below, you'll find descriptions and usage instructions for each script.
 ## Table of Contents
 
 - [Prerequisites](#prerequisites)
-- [Rationale](#workflow-and-rationale)
+- [Workflow and Rationale](#workflow-and-rationale)
 - [PDF Downloader and Data Extraction Script](#pdf-downloader-and-data-extraction-script)
 - [PDF Table of Contents Extractor](#pdf-table-of-contents-extractor)
-- [PDF Document Number Extractor](#pdf-document-number-extractor)
+- [PDF Document ID Extractor](#pdf-document-id-extractor)
 - [Named Entity Recognition (NER) Benchmark](#named-entity-recognition-ner-benchmark)
 - [Named Entity Recognition (NER) from PDFs](#named-entity-recognition-ner-from-pdfs)
 - [Combine and Sort CSV Files](#combine-and-sort-csv-files)
@@ -59,10 +59,10 @@ This script extracts the table of contents (TOC) from a PDF file and optionally 
 python naive_section_finder.py <pdf_file> [--output-file output.xlsx]
 ```
 
-## PDF Document Number Extractor
+## PDF Document ID Extractor
 
 **Description:**
-This script allows you to extract document numbers (or number-letter combinations) from PDF files.
+This script allows you to extract DocumentIDs (numbers or number-letter combinations) from PDF files.
 It uses PyMuPDF for PDF document handling and Tesseract for Optical Character Recognition (OCR) when necessary.
 
 **Usage:**
