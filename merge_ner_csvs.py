@@ -1,5 +1,5 @@
 """
-combine_and_sort_csv.py
+ombine and Sort NER Results
 
 This script combines multiple CSV files and optionally sorts the combined data by a specified column and direction. It then saves the result to a new CSV file.
 

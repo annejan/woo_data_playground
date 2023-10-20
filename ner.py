@@ -1,5 +1,5 @@
 """
-ner.py
+Named Entity Recognition
 
 This script reads a PDF file, performs Named Entity Recognition (NER) using Flair, and extracts named entities with a specified certainty level.
 It can write the results to an Excel file, a CSV file, or print them to the console.
