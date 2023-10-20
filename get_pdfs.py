@@ -25,7 +25,7 @@ Main function orchestrating the entire process.
     a warning message is printed, suggesting a possible issue with the data source.
 
 Example Usage:
-    python script_name.py
+    python get_pdfs.py
 
 SPDX-License-Identifier: EUPL-1.2
 """

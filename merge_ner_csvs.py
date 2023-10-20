@@ -1,7 +1,9 @@
 """
-ombine and Sort NER Results
+Combine and Sort NER Results
 
-This script combines multiple CSV files and optionally sorts the combined data by a specified column and direction. It then saves the result to a new CSV file.
+This script combines multiple CSV files, merges rows with the same 'Text' and 'Tag'
+by aggregating their counts, and optionally sorts the combined data by a specified column and direction.
+It then saves the result to a new CSV file.
 
 Usage:
     python combine_and_sort_csv.py <input_files> [--output output_file.csv] [--sort-by sort_column] [--sort-direction (asc|desc)]
@@ -10,7 +12,7 @@ Arguments:
     input_files: Input CSV files to be combined.
     output_file: (Optional) Output CSV file name for the combined data. Default is 'combined.csv'.
     sort_column: (Optional) Column name to sort the data by. Default is 'Count'.
-    sort_direction: (Optional) Sort direction: 'asc' (ascending) or 'desc' (descending). Default is 'asc'.
+    sort_direction: (Optional) Sort direction: 'asc' (ascending) or 'desc' (descending). Default is 'desc'.
 
 Example:
     python combine_and_sort_csv.py file1.csv file2.csv --output sorted_output.csv --sort-by Tag --sort-direction desc
@@ -28,7 +30,11 @@ def combine_and_sort_csv(file_names, output_file, sort_column, sort_direction):
         df = pd.read_csv(file_name)
         dataframes.append(df)
 
+    # Concatenate dataframes
     combined_df = pd.concat(dataframes, ignore_index=True)
+
+    # Group by 'Text' and 'Tag' columns and aggregate their counts
+    combined_df = combined_df.groupby(['Text', 'Tag'], as_index=False).agg({'Count':'sum'})
 
     if sort_column:
         combined_df = combined_df.sort_values(
@@ -53,7 +59,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--sort-direction",
-        default="asc",
+        default="desc",
         choices=["asc", "desc"],
         help='Sort direction: "asc" (ascending) or "desc" (descending) (default: asc)',
     )
