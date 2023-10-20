@@ -101,9 +101,10 @@ python merge_ner_csvs.py <input_files> [--output combined_and_sorted.csv]
 
 ## **License**
 
-According to ChatGPT 4.0 it is OK to license ChatGPT generated code as EUP-L1.2 so there should be no issues here. 
+According to ChatGPT 4.0 it is OK to license ChatGPT generated code as EUP-L1.2 so there should be no issues here, part of this code and documentation is written by AI.
 Woo Data Playground is open-source, abiding by the [European Union Public License version 1.2](https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12). You're granted the freedom to utilize, adapt, and distribute the software under the license's terms.
 
 ## **Contributing**
 
-Your contributions are invaluable. Whether it's a novel feature suggestion, a bug report, or feedback, kindly visit our GitHub repository to collaborate.
+"Got insights or found an issue? 🌟 Jump into our GitHub! Every idea and observation enriches our content. 
+Your voice makes all the difference.
