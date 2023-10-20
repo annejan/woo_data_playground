@@ -2,3 +2,4 @@ PyMuPDF==1.23.4
 openpyxl==3.1.2
 requests==2.31.0
 flair==0.12.2
+transformers==4.30.0
