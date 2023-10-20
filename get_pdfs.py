@@ -7,8 +7,22 @@ It utilizes the requests library to make web requests, BeautifulSoup for HTML pa
 and csv for working with CSV files.
 
 Usage:
-    - Modify the 'json_url' variable to specify the JSON data source URL.
+    - Modify the JSON_URL and BASE_URL variables to specify the data source URLs.
     - Run the script to download PDFs, create folders, and save title information to CSV.
+
+Main function orchestrating the entire process.
+
+    The workflow consists of the following steps:
+    1. Fetch JSON data from the specified URL.
+    2. Verify the integrity of the fetched data by comparing result count with total count.
+    3. If the data is valid, process the link-title pairs. This involves:
+       - Extracting link-title pairs.
+       - Downloading PDFs associated with each link.
+       - Creating directories for each link.
+       - Writing the title information to a CSV file and saving PDF links to respective directories.
+
+    If there's a mismatch between the result count and the total count from the fetched JSON data,
+    a warning message is printed, suggesting a possible issue with the data source.
 
 Example Usage:
     python script_name.py
@@ -121,6 +135,20 @@ def main():
 
     It retrieves JSON data from a specified URL, processes it to extract link-title pairs,
     downloads associated PDFs, creates folders, and saves title information to a CSV file.
+
+    The JSON object consists of several key-value pairs:
+
+    1. v: An integer, likely representing the version of the data or the API. The value is `2`.
+    2. service: A string indicating the name of the service from which the data originates. In this case, it's `"wobcovid19-search"`.
+    3. totalcount: An integer representing the total number of results or items present in the dataset. Here, it's `275`.
+    4. results: An array of objects, each detailing a specific publication. Each object in this array contains:
+        - link: A string prefixed by a hash (`#`), possibly indicating a unique identifier or anchor for the publication.
+        - publication: An object that further provides details about the publication:
+            - summary: A brief description or summary of the publication.
+            - id: A unique identifier for the publication. It starts with the prefix `wrd:` followed by a series of alphanumeric characters.
+            - title: The title of the publication.
+            - publicationdate: A timestamp string in the ISO 8601 format, indicating the date of the publication.
+        - score: An integer, which might indicate relevance, confidence, or priority associated with the publication.
     """
     data = get_json_data(JSON_URL)
 
