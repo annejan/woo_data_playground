@@ -5,15 +5,13 @@ from flair.data import Sentence
 from flair.models import SequenceTagger
 
 
-def read_pdf_line_by_line(pdf_file):
+def read_pdf_text(pdf_file):
     doc = fitz.open(pdf_file)
 
     for page_num in range(len(doc)):
         page = doc[page_num]
         text = page.get_text("text")
-
-        for line in text.splitlines():
-            yield line
+        yield text
 
 
 if __name__ == "__main__":
@@ -33,8 +31,8 @@ if __name__ == "__main__":
 
     tagger = SequenceTagger.load("flair/ner-dutch-large")
 
-    for line in read_pdf_line_by_line(args.pdf_file):
-        sentence = Sentence(line)
+    for text in read_pdf_text(args.pdf_file):
+        sentence = Sentence(text)
         tagger.predict(sentence)
         for entity in sentence.get_spans("ner"):
             print(entity)
