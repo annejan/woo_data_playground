@@ -162,12 +162,8 @@ def extract_number(id):
 
     If no numeric part is found in the input string, the function returns None.
     """
-    # Use regular expression to extract the numeric part
     numeric_part = re.match(r"\d+", id)
-
-    # Check if a match was found
     if numeric_part:
-        # Convert the numeric part to an integer
         return int(numeric_part.group())
 
 
@@ -250,16 +246,13 @@ def analyse(output_data, minimum, maximum):
     analyse(output_data, minimum=1, maximum=10)
     ```
     """
-    # Extract document IDs
     document_ids = [
         re.match(r"(\d+)([A-Za-z]*)", doc_id).groups() for doc_id, _ in output_data
     ]
 
-    # Initialize variables to track anomalies
     out_of_order_ids = []
     missing_ids = []
 
-    # Iterate through the sorted list to detect out-of-order and missing IDs
     prev_id = (minimum - 1, "")
     first = True
     for doc_id, letter_part in document_ids:
@@ -287,7 +280,6 @@ def analyse(output_data, minimum, maximum):
             prev_id = (numeric_part, letter_part)
             first = False
 
-    # Report out-of-order and missing IDs
     if out_of_order_ids:
         print(f"Out-of-order document IDs: {', '.join(out_of_order_ids)}")
     if missing_ids:
