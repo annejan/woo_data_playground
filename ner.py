@@ -1,7 +1,7 @@
 """
 Named Entity Recognition
 
-This script reads a PDF file, performs Named Entity Recognition (NER) using Flair, and extracts named entities with a specified certainty level.
+This script reads a PDF file, performs Named Entity Recognition (NER) using Flair, and extracts named entities,such as persons, organizations and locations, with a specified certainty level.
 It can write the results to an Excel file, a CSV file, or print them to the console.
 
 Usage:
