@@ -161,3 +161,4 @@ cython_debug/
 #.idea/
 
 tesseract_opencl_profile_devices.dat
+data/

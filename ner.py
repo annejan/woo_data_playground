@@ -1,9 +1,11 @@
 import argparse
+import csv
 import fitz  # PyMuPDF
 import flair
 import torch
 from flair.data import Sentence
 from flair.models import SequenceTagger
+from openpyxl import Workbook
 
 
 def get_entities_with_certainty(pdf_file, certainty):
@@ -26,6 +28,28 @@ def get_entities_with_certainty(pdf_file, certainty):
     return entity_info
 
 
+def write_to_excel(sorted_entities, output_file):
+    workbook = Workbook()
+    sheet = workbook.active
+    sheet.title = "Entities"
+    sheet["A1"] = "Text"
+    sheet["B1"] = "Tag"
+    sheet["C1"] = "Count"
+    for i, (entity_text, info) in enumerate(sorted_entities, start=2):
+        sheet[f"A{i}"] = entity_text
+        sheet[f"B{i}"] = info["tag"]
+        sheet[f"C{i}"] = info["count"]
+    workbook.save(output_file)
+
+
+def write_to_csv(sorted_entities, output_file):
+    with open(output_file, mode="w", newline="") as csv_file:
+        writer = csv.writer(csv_file)
+        writer.writerow(["Text", "Tag", "Count"])
+        for entity_text, info in sorted_entities:
+            writer.writerow([entity_text, info["tag"], info["count"]])
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Read a PDF file and perform Named Entity Recognition (NER)."
@@ -39,6 +63,16 @@ if __name__ == "__main__":
         type=float,
         default=0.9,
         help="Minimum certainty for entities (default: 0.9).",
+    )
+    parser.add_argument(
+        "--output-excel",
+        required=False,
+        help="Path to the output Excel file.",
+    )
+    parser.add_argument(
+        "--output-csv",
+        required=False,
+        help="Path to the output CSV file.",
     )
     args = parser.parse_args()
     if args.cuda:
@@ -57,3 +91,11 @@ if __name__ == "__main__":
         entity_tag = info["tag"]
         entity_count = info["count"]
         print(f"Text: {entity_text}, Tag: {entity_tag}, Count: {entity_count}")
+
+    if args.output_excel:
+        write_to_excel(sorted_entities, args.output_excel)
+        print(f"Data has been written to {args.output_excel}")
+
+    if args.output_csv:
+        write_to_csv(sorted_entities, args.output_csv)
+        print(f"Data has been written to {args.output_csv}")
