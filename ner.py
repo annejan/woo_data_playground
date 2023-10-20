@@ -1,8 +1,9 @@
 """
 Named Entity Recognition
 
-This script reads a PDF file, performs Named Entity Recognition (NER) using Flair, and extracts named entities,such as persons, organizations and locations, with a specified certainty level.
-It can write the results to an Excel file, a CSV file, or print them to the console.
+This script reads a PDF file, performs Named Entity Recognition (NER) using Flair.
+It extracts named entities, such as persons, organizations and locations, with a specified certainty level.
+It can write the results to an Excel file, a CSV file, or just print them to the console.
 
 Usage:
     python ner.py <pdf_file> [--cuda] [--certainty <certainty>] [--output-excel <output_excel>] [--output-csv <output_csv>]
