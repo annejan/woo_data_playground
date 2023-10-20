@@ -14,6 +14,8 @@ Arguments:
 
 Example:
     python combine_and_sort_csv.py file1.csv file2.csv --output sorted_output.csv --sort-by Tag --sort-direction desc
+
+SPDX-License-Identifier: EUPL-1.2
 """
 import argparse
 import pandas as pd

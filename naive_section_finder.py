@@ -2,6 +2,8 @@
 PDF Table of Contents Extractor
 
 This script extracts the table of contents (TOC) from a PDF file and optionally writes it to an Excel file.
+
+SPDX-License-Identifier: EUPL-1.2
 """
 import argparse
 import fitz  # PyMuPDF

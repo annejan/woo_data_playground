@@ -17,6 +17,8 @@ Arguments:
 
 Example:
     python ner.py document.pdf --cuda --certainty 0.8 --output-excel entities.xlsx --output-csv entities.csv
+
+SPDX-License-Identifier: EUPL-1.2
 """
 import argparse
 import csv

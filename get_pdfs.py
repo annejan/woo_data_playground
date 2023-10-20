@@ -12,11 +12,16 @@ Usage:
 
 Example Usage:
     python script_name.py
+
+SPDX-License-Identifier: EUPL-1.2
 """
 import os
 import requests
 import csv
 from bs4 import BeautifulSoup
+
+BASE_URL = "https://wobcovid19.rijksoverheid.nl/publicaties/"
+JSON_URL = "https://do-ams3-17.hw.webhare.net/services/wobcovid19-prod-v2-1/search/?first=0&count=300&orderby=publicationdate"
 
 
 def get_json_data(json_url):
@@ -117,9 +122,7 @@ def main():
     It retrieves JSON data from a specified URL, processes it to extract link-title pairs,
     downloads associated PDFs, creates folders, and saves title information to a CSV file.
     """
-    base_url = "https://wobcovid19.rijksoverheid.nl/publicaties/"
-    json_url = "https://do-ams3-17.hw.webhare.net/services/wobcovid19-prod-v2-1/search/?first=0&count=300&orderby=publicationdate"
-    data = get_json_data(json_url)
+    data = get_json_data(JSON_URL)
 
     if data:
         if len(data.get("results", [])) == data.get("totalcount", 0):
@@ -141,10 +144,10 @@ def main():
                     os.mkdir(pub)
                 with open(f"{pub}/title.txt", "w") as file:
                     file.write(title)
-                pdf_links = get_pdf_links_from_webpage(f"{base_url}{pub}/")
+                pdf_links = get_pdf_links_from_webpage(f"{BASE_URL}{pub}/")
                 with open(f"{pub}/pdfs.txt", "w") as file:
                     for pdf in pdf_links:
-                        pdf_url = f"{base_url}{pub}/{pdf}"
+                        pdf_url = f"{BASE_URL}{pub}/{pdf}"
                         pdf_path = f"{pub}/{pdf}"
                         file.write(pdf_url + "\n")
                         if not os.path.exists(pdf_path) and not os.path.exists(

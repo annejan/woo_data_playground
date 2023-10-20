@@ -1,8 +1,10 @@
-# Woo data playground Python PDF Utility Scripts
+# Woo Data Playground: Python PDF Utility Scripts
 
 This repository contains a collection of Python scripts for working with PDF documents.
-Each script is designed to perform specific tasks related to PDF handling, text extraction, and named entity recognition (NER).
-Below, you'll find descriptions and usage instructions for each script.
+Each script is designed to perform specific tasks related to PDF downloading, text extraction etc.
+Central to its functionalities is the ability to dissect vast PDFs into identifiable sub-documents, using the Table of Contents or specific page regions.
+Additionally, it supports text extraction and provides tools for Named Entity Recognition (NER) to categorize and interpret content.
+Further details and instructions for each utility can be found below.
 
 ## Table of Contents
 
@@ -46,7 +48,7 @@ It utilizes the `requests` library for making web requests, `BeautifulSoup` for 
 - Optionally modify the 'json_url' variable to specify the JSON data source URL.
 - Run the script to download PDFs, create folders, and save title information to CSV.
 
-For more information read the [pdfs](pdfs.md) documentation.
+For more information read the [PDF Downloader](download_pdfs.md) documentation.
 
 ## PDF Table of Contents Extractor
 

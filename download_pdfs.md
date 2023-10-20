@@ -29,17 +29,17 @@ pip install -r requirements.txt
 
 You can customize the script for your specific use case:
 
-- Modify the `json_url` and `base_url` variables to point to your data source and web source.
+- Modify the `JSON_URL` and `BASE_URL` variables to point to your data source and web source.
 - Customize the naming of folders and files as per your requirements.
 - Extend the functionality to handle additional data processing or tasks.
 
 ## Warning
 
-This script downloads approximately 80 Gigabytes of PDF files in its default configuration!
+This `get_pdfs.py` script downloads approximately 80 Gigabytes of PDF files in its default configuration!
 
 1. Open the script in a text editor and configure the following variables:
-   - `json_url`: The URL of the JSON data source.
-   - `base_url`: The base URL of the web source containing PDF links.
+   - `JSON_URL`: The URL of the JSON data source.
+   - `BASE_URL`: The base URL of the web source containing PDF links.
 2. Run the script by executing the following command in your terminal:
 
 ```bash

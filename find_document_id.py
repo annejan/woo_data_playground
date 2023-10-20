@@ -38,6 +38,8 @@ This package is open-source and released under the European Union Public License
 You are free to use, modify, and distribute the package in accordance with the terms of the license.
 
 For contributions, bug reports, or suggestions, please visit the project repository on GitHub.
+
+SPDX-License-Identifier: EUPL-1.2
 """
 import argparse
 import re
