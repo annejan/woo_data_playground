@@ -1,148 +1,122 @@
-# PDF Document Number Extractor
+# Woo data playground Python PDF Utility Scripts
 
-This Python script allows you to extract document IDs (number or number letter combination) from a PDF file.
-It can locate and extract information based on a specified viewbox or use a default viewbox if none is provided.
-The script uses the PyMuPDF library to handle PDF files and Tesseract for Optical Character Recognition (OCR) when necessary.
+This repository contains a collection of Python scripts for working with PDF documents.
+Each script is designed to perform specific tasks related to PDF handling, text extraction, and named entity recognition (NER).
+Below, you'll find descriptions and usage instructions for each script.
+
+## Table of Contents
+
+- [Prerequisites](#prerequisites)
+- [Rationale](#workflow-and-rationale)
+- [PDF Downloader and Data Extraction Script](#pdf-downloader-and-data-extraction-script)
+- [PDF Table of Contents Extractor](#pdf-table-of-contents-extractor)
+- [PDF Document Number Extractor](#pdf-document-number-extractor)
+- [Named Entity Recognition (NER) Benchmark](#named-entity-recognition-ner-benchmark)
+- [Named Entity Recognition (NER) from PDFs](#named-entity-recognition-ner-from-pdfs)
+- [Combine and Sort CSV Files](#combine-and-sort-csv-files)
 
 ## Prerequisites
 
 Before you can use this script, you need to have the following prerequisites installed on your system:
 
 - Python 3.x
-- PyMuPDF (fitz)
-- OpenPyXL
 - Tesseract OCR
 
-### Installing PyMuPDF (fitz)
+### Installing PyMuPDF (fitz), Flair, Pandas and OpenPyXL
 
-You can install the PyMuPDF library (fitz) using pip:
-
-```bash
-pip install PyMuPDF
-pip install openpyxl
-```
-
-or
+You can install the PyMuPDF and OpenPyXL libraries using pip:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### Installing Tesseract OCR
+## Workflow and rationale
 
-You need to install Tesseract OCR on your system. Visit the [Tesseract OCR GitHub page](https://github.com/tesseract-ocr/tesseract) for installation instructions specific to your operating system.
+To move the old publications from [wobcovid19.rijksoverheid.nl](https://wobcovid19.rijksoverheid.nl/) and upload them to [open.minvws.nl](https://open.minvws.nl/) we want to cut them up into separate documents.
+This has to be done on original or local document id basis. Unfortunately not all PDFs have the same kind of quality.
 
-## Usage
-
-To use this script, follow these steps:
-
-1. Clone this repository or download the `find_document_number.py` script to your local machine.
-
-2. Make sure you have a PDF file that you want to extract data from.
-
-3. Open a terminal or command prompt and navigate to the directory containing the `pdf_data_extractor.py` script.
-
-4. Run the script with the following command, replacing `<pdf_file>` with the path to your PDF file:
-
-    ```bash
-    python find_document_number.py <pdf_file>
-    ```
-
-Optional: You can specify a custom viewbox using the `--viewbox` argument. The viewbox should be provided as four floating-point numbers separated by spaces (left top right bottom).
-
-For example:
-
-```bash
-python find_document_number.py <pdf_file> --viewbox -180 20 -20 120
-```
-
-The script will extract document numbers from the PDF file and display the extracted information and page number on the terminal.
-
-Negative numbers for the viewbox coordinates offset the viewbox from the right and bottom edges of the page, rather than the left and top edges.
-This allows you to specify a rectangular region within the PDF page based on its distance from the right and bottom edges.
-
-## Example Output
-
-```
-Document: 1     on page: 1
-Document: 2     on page: 3
-Document: 2a    on page: 5
-Document: 3     on page: 7
-```
-
-## Saving to an Excel File
-
-You can also save the extracted document numbers and their corresponding page numbers to an Excel file by using the `--output-file` argument. For example:
-
-```bash
-python find_document_number.py <pdf_file> --output-file output.xlsx
-```
-
-## Document ID range
-
-Optional: You can specify a range of acceptable document IDs using the `--min` and `--max` arguments.
-This ensures that only document IDs within the specified range are considered.
-If not provided, the default range is from 1 to 99999999.
-
-Example:
-
-```bash
-python find_document_number.py <pdf_file> --min 10 --max 100
-```
-
-## Basic analysis
-
-The optional `--analyse` flag tries to do some basic detection of out-of-order and missing document IDs.
-
-```
-Document: 30    on page: 1
-Document: 28    on page: 5
-Document: 32    on page: 9
-Document: 32a   on page: 10
-Document: 33    on page: 13
-Out-of-order document IDs: 28
-Missing document IDs: 31
-```
+The NER scripts are there to see if we can optimise the search engine and since we have the data here anyway I'm using the same playground repository.
 
 ## PDF Downloader and Data Extraction Script
 
-This Python script is designed to download PDF files from a specific webpage, extract link-title pairs from JSON data, and organize the downloaded PDFs into folders. It can be used to automate the retrieval of PDF documents from a web source and store them locally.
+**Description:**
+This script retrieves JSON data from [wobcovid19.rijksoverheid.nl](https://wobcovid19.rijksoverheid.nl/), extracts link-title pairs from the data, downloads associated PDF files, creates folders, and saves title information to a CSV file.
+It utilizes the `requests` library for making web requests, `BeautifulSoup` for HTML parsing, and `csv` for working with CSV files.
 
-- Required Python libraries: requests and BeautifulSoup. You can install them using pip:
+- Optionally modify the 'json_url' variable to specify the JSON data source URL.
+- Run the script to download PDFs, create folders, and save title information to CSV.
 
-```bash
-pip install requests beautifulsoup4
-```
+For more information read the [pdfs](pdfs.md) documentation.
 
-## Customization
+## PDF Table of Contents Extractor
 
-You can customize the script for your specific use case:
+**Description:**
+This script extracts the table of contents (TOC) from a PDF file and optionally writes it to an Excel file.
 
-- Modify the `json_url` and `base_url` variables to point to your data source and web source.
-- Customize the naming of folders and files as per your requirements.
-- Extend the functionality to handle additional data processing or tasks.
-
-## Warning
-
-This script downloads approximately 80 Gigabytes of PDF files in its default configuration!
-
-1. Open the script in a text editor and configure the following variables:
-   - `json_url`: The URL of the JSON data source.
-   - `base_url`: The base URL of the web source containing PDF links.
-2. Run the script by executing the following command in your terminal:
+**Usage:**
 
 ```bash
-python script_name.py
+python naive_section_finder.py <pdf_file> [--output-file output.xlsx]
 ```
 
-The script will retrieve JSON data, process it, and download PDFs into folders based on the retrieved data.
+## PDF Document Number Extractor
 
-## Script Overview
+**Description:**
+This script allows you to extract document numbers (or number-letter combinations) from PDF files.
+It uses PyMuPDF for PDF document handling and Tesseract for Optical Character Recognition (OCR) when necessary.
 
-- The script retrieves JSON data from a specified URL using the `requests` library.
-- It extracts link-title pairs from the JSON data and saves them in a CSV file.
-- For each link-title pair, the script creates a folder and saves the title information in a text file.
-- It also downloads associated PDF files and saves them in the corresponding folders.
+**Usage:**
+
+```bash
+python find_document_id.py <pdf_file> [--output-file output.xlsx]
+```
+
+**Optional:**
+
+- You can specify a custom viewbox using the `--viewbox` argument. The viewbox should be provided as four floating-point numbers separated by spaces (left top right bottom).
+- You can specify an output Excel file using the `--output-file` argument. If not provided, data will be saved to "output.xlsx."
+
+For more information read the [document_ids](document_ids.md) documentation.
+
+## Named Entity Recognition (NER) Benchmark
+
+**Description:**
+This script performs Named Entity Recognition (NER) using Flair's pre-trained models.
+It allows you to evaluate NER performance using CUDA (if available) and provides the elapsed time for NER processing.
+
+**Usage:**
+
+```bash
+python ner-benchmark.py [--cuda]
+```
+
+## Named Entity Recognition (NER) from PDFs
+
+**Description:**
+This script reads a PDF file and performs Named Entity Recognition (NER) using Flair's pre-trained NER models.
+It extracts entities with a specified minimum certainty and provides the option to save the results to an Excel or CSV file.
+
+**Usage:**
+
+```bash
+python ner.py <pdf_file> [--cuda] [--certainty 0.9] [--output-excel output.xlsx] [--output-csv output.csv]
+```
+
+For more information read the [named entity recognition](named_entity_recognition.md) documentation.
+
+## Combine and Sort CSV Files
+
+**Description:**
+This script combines and sorts multiple CSV files.
+It can be useful when you want to merge multiple CSV files containing entity data from different PDFs into a single, sorted CSV file.
+
+**Usage:**
+
+```bash
+python merge_ner_csvs.py <input_files> [--output combined_and_sorted.csv]
+```
+
+Please follow the individual usage instructions for each script to perform specific tasks on your PDF documents.
 
 ## License
 

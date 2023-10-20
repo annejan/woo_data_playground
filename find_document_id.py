@@ -12,13 +12,13 @@ Key Features:
 - Provides clear command-line usage with options for specifying PDF files, viewboxes, and an output Excel file.
 
 Usage:
-1. Clone this repository or download the `pdf_data_extractor.py` script to your local machine.
+1. Clone this repository or download the `find_document_id.py` script to your local machine.
 2. Ensure you have a PDF file that you want to extract data from.
-3. Open a terminal or command prompt and navigate to the directory containing the `pdf_data_extractor.py` script.
+3. Open a terminal or command prompt and navigate to the directory containing the `find_document_id.py` script.
 4. Run the script with the following command, replacing `<pdf_file>` with the path to your PDF file:
 
    ```bash
-   python pdf_data_extractor.py <pdf_file>
+   python find_document_id.py <pdf_file>
    ```
 
 Optional: You can specify a custom viewbox using the `--viewbox` argument.
@@ -27,10 +27,10 @@ The viewbox should be provided as four floating-point numbers separated by space
 For example:
 
    ```bash
-   python pdf_data_extractor.py <pdf_file> --viewbox -180 20 -20 120
+   python find_document_id.py <pdf_file> --viewbox -180 20 -20 120
    ```
 
-Optional: You can specify an output Excel file using the --output-file argument. If not provided, data will be saved to "output.xlsx."
+Optional: You can specify an output Excel file using the --output-file argument.
 
 The script will extract document numbers from the PDF file and display and/or save the extracted information in an Excel file.
 
@@ -312,7 +312,7 @@ def main():
     To extract document numbers from a PDF file, run this script from the command line with the following command:
 
     ```
-    python pdf_data_extractor.py <pdf_file> [--viewbox L T R B] [--output-file output.xlsx] [--analyse] [--minimum MIN] [--maximum MAX]
+    python find_document_id.py <pdf_file> [--viewbox L T R B] [--output-file output.xlsx] [--analyse] [--minimum MIN] [--maximum MAX]
     ```
 
     If the `--output-file` option is not provided, the script will default to saving the data in an Excel file named "output.xlsx."
@@ -324,7 +324,7 @@ def main():
     To extract document numbers from a PDF file and analyse for out-of-order and missing IDs within the range 1 to 20:
 
     ```
-    python pdf_data_extractor.py <pdf_file> --analyse --minimum 1 --maximum 20
+    python find_document_id.py <pdf_file> --analyse --minimum 1 --maximum 20
     ```
 
     If the `--minimum` and `--maximum` options are not provided, the script will use 1 as the minimum.

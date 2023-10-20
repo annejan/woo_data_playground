@@ -79,7 +79,7 @@ if __name__ == "__main__":
         flair.device = torch.device("cuda")
     else:
         flair.device = torch.device("cpu")
-    tagger = SequenceTagger.load("flair/ner-multi")
+    tagger = SequenceTagger.load("flair/ner-dutch-large")
     entity_info = get_entities_with_certainty(args.pdf_file, args.certainty)
     sorted_entities = sorted(
         entity_info.items(), key=lambda x: x[1]["count"], reverse=True
