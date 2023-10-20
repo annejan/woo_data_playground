@@ -4,13 +4,7 @@ This repository contains a collection of Python scripts for performing Named Ent
 Each script is designed to extract named entities, such as persons, organizations, locations, and more, from text data using [Flair](https://flairnlp.github.io/)'s pre-trained NER models.
 Below, you'll find descriptions and usage instructions for each NER script.
 
-We are using the [flair/ner-dutch-large](https://huggingface.co/flair/ner-dutch-large) model.
-
-## Table of Contents
-
-- [Named Entity Recognition (NER) Benchmark](#named-entity-recognition-ner-benchmark)
-- [Named Entity Recognition (NER) from PDFs](#named-entity-recognition-ner-from-pdfs)
-- [Combine and Sort NER Results](#combine-and-sort-ner-results)
+By default, the script uses the [flair/ner-dutch-large](https://huggingface.co/flair/ner-dutch-large) model.
 
 ## Named Entity Recognition (NER) Benchmark
 

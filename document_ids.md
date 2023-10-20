@@ -31,7 +31,37 @@ pip install -r requirements.txt
 
 You need to install Tesseract OCR on your system. Visit the [Tesseract OCR GitHub page](https://github.com/tesseract-ocr/tesseract) for installation instructions specific to your operating system.
 
-## Usage
+## PDF Table of Contents Extractor
+
+This Python script is designed to extract the table of contents (TOC) from a PDF file and optionally write it to an Excel file. It uses the PyMuPDF library to analyze the PDF's structure and retrieve TOC information.
+
+### Features
+
+- Extracts the table of contents (TOC) from a PDF file.
+- Writes the extracted document numbers and their corresponding page numbers to an Excel file.
+
+### Usage
+
+You can run the script from the command line with the following usage:
+
+```bash
+python naive_section_finder.py <pdf_file> [--output-file <output_excel>]
+```
+
+- `<pdf_file>`: The path to the PDF file you want to analyze.
+- `--output-file <output_excel>` (optional): Specify the output Excel file where the TOC data will be saved.
+
+### Example
+
+```bash
+python naive_section_finder.py sample.pdf --output-file toc.xlsx
+```
+
+In this example, the script will process `sample.pdf` and save the extracted TOC data to an Excel file named `toc.xlsx`.
+
+## Finding documents the hard way
+
+Unfortunately not all PDF files have a (useful) table of contents, in that case we'll have to do it the hard way.
 
 To use this script, follow these steps:
 
@@ -43,9 +73,9 @@ To use this script, follow these steps:
 
 4. Run the script with the following command, replacing `<pdf_file>` with the path to your PDF file:
 
-    ```bash
-    python find_document_id.py <pdf_file>
-    ```
+ ```bash
+ python find_document_id.py <pdf_file>
+ ```
 
 Optional: You can specify a custom viewbox using the `--viewbox` argument. The viewbox should be provided as four floating-point numbers separated by spaces (left top right bottom).
 
