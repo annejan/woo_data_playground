@@ -47,7 +47,8 @@ python ner.py --cuda --output-csv data/*/*.pdf
 ## Combine and Sort NER Results
 
 **Description:**
-This script combines and sorts multiple NER results from CSV files. It can be useful when you have multiple result files from NER extraction and want to merge and sort the entities into a single output file.
+This script combines and sorts multiple NER results from CSV files.
+It can be useful when you have multiple result files from NER extraction and want to merge and sort the entities into a single output file.
 
 **Usage:**
 
@@ -63,6 +64,10 @@ python merge_ner_results.py data/*/*.ner.csv
 
 These NER scripts provide tools for extracting named entities from text data, especially within PDF files.
 Please follow the usage instructions for each script to perform NER on your text data or merge and sort NER results as needed.
+
+## Memory usage
+
+Currently, this script uses about 4 GB of memory, to check the active memory usage you can use the nifty [CUDA memory](cuda_memory.md) monitor. 
 
 ## License
 
