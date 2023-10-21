@@ -25,6 +25,7 @@ import csv
 import os
 import re
 import string
+from typing import Dict, List, Tuple, Union
 import fitz  # PyMuPDF
 import torch
 from flair.data import Sentence
@@ -57,13 +58,16 @@ def is_meaningful_content(s: str, threshold: float = 0.0) -> bool:
     return proportion_meaningful >= threshold
 
 
-def process_entities(sentence, tagger, certainty, verbose):
+def process_entities(
+    sentence: Sentence, tagger: SequenceTagger, certainty: float, verbose: bool
+) -> Dict[str, Dict[str, Union[str, int]]]:
     """
     Process named entities in a given sentence using the Flair tagger.
 
     :param sentence: flair.data.Sentence, the sentence object to process.
     :param tagger: flair.models.SequenceTagger, the Flair NER tagger model.
     :param certainty: float, the minimum score required to consider an entity.
+    :param verbose: bool, print some information.
     :return: dict, entities found in the sentence, with their count and tag.
     """
     entity_info = {}
@@ -85,7 +89,9 @@ def process_entities(sentence, tagger, certainty, verbose):
         print(f"Error in NER tagging: {e}\n{sentence}")
 
 
-def get_entities_from_pdf(pdf_file, tagger, certainty, verbose):
+def get_entities_from_pdf(
+    pdf_file: str, tagger: SequenceTagger, certainty: float, verbose: bool
+) -> Dict[str, Dict[str, Union[str, int]]]:
     """
     Extract named entities from a given PDF file using the Flair tagger.
 
@@ -125,7 +131,9 @@ def get_entities_from_pdf(pdf_file, tagger, certainty, verbose):
     return entities
 
 
-def write_to_excel(sorted_entities, output_file):
+def write_to_excel(
+    sorted_entities: List[Tuple[str, Dict[str, Union[str, int]]]], output_file: str
+) -> None:
     """
     Write extracted entities to an Excel file.
 
@@ -150,7 +158,9 @@ def write_to_excel(sorted_entities, output_file):
         print(f"Error writing to Excel: {e}")
 
 
-def write_to_csv(sorted_entities, output_file):
+def write_to_csv(
+    sorted_entities: List[Tuple[str, Dict[str, Union[str, int]]]], output_file: str
+) -> None:
     """
     Write extracted entities to a CSV file.
 
@@ -169,7 +179,7 @@ def write_to_csv(sorted_entities, output_file):
         print(f"Error writing to CSV: {e}")
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(
         description="Read a PDF file and perform Named Entity Recognition (NER)."
     )
