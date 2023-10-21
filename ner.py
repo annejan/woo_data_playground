@@ -23,6 +23,8 @@ SPDX-License-Identifier: EUPL-1.2
 import argparse
 import csv
 import os
+import re
+import string
 import fitz  # PyMuPDF
 import torch
 from flair.data import Sentence
@@ -30,6 +32,24 @@ from flair.models import SequenceTagger
 import openpyxl
 from openpyxl import Workbook
 from tqdm import tqdm
+
+
+def is_meaningful_content(s: str, threshold: float = 0.0) -> bool:
+    """
+    Check if a string contains meaningful content.
+
+    Parameters:
+    - s (str): Input string to check.
+    - threshold (float): Proportion of meaningful characters required.
+
+    Returns:
+    - bool: True if the string is meaningful, False otherwise.
+    """
+    cleaned_string = re.sub(r'\s', '', s)
+    meaningful_chars = sum(
+        1 for char in cleaned_string if char in string.ascii_letters + string.digits + string.punctuation)
+    proportion_meaningful = meaningful_chars / len(cleaned_string) if cleaned_string else 0
+    return proportion_meaningful >= threshold
 
 
 def process_entities(sentence, tagger, certainty, verbose):
@@ -84,7 +104,7 @@ def get_entities_from_pdf(pdf_file, tagger, certainty, verbose):
                     print(f"Page[{page_num}]")
                 page = doc[page_num]
                 text = page.get_text("text")
-                if not text.strip():
+                if not text.strip() and is_meaningful_content(text):
                     continue
                 entities_page = process_entities(
                     Sentence(text), tagger, certainty, verbose
