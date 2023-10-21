@@ -6,12 +6,12 @@ Below, you'll find descriptions and usage instructions for each NER script.
 
 By default, the script uses the [flair/ner-dutch-large](https://huggingface.co/flair/ner-dutch-large) model.
 
-## Dependencies:
+## Dependencies
 
 Ensure you have all required libraries installed. You can do this using `pip`:
 
 ```bash
-pip install PyMuPDF flair openpyxl tqdm****
+pip install PyMuPDF flair openpyxl tqdm
 ```
 
 ## Named Entity Recognition (NER) Benchmark

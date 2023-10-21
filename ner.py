@@ -79,15 +79,14 @@ def get_entities_from_pdf(pdf_file, tagger, certainty, verbose):
                 print(f"Page[{page_num}]")
             page = doc[page_num]
             text = page.get_text("text")
-            if text.strip():
-                entities_page = process_entities(
-                    Sentence(text), tagger, certainty, verbose
-                )
-                for key, value in entities_page.items():
-                    if key in entities:
-                        entities[key]["count"] += value["count"]
-                    else:
-                        entities[key] = value
+            if not text.strip():
+                continue
+            entities_page = process_entities(Sentence(text), tagger, certainty, verbose)
+            for key, value in entities_page.items():
+                if key in entities:
+                    entities[key]["count"] += value["count"]
+                else:
+                    entities[key] = value
     return entities
 
 

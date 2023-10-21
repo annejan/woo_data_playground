@@ -13,6 +13,7 @@ With Woo Data Playground, we've blended innovation with utility. Brace yourself 
 Offering a smorgasbord of Python scripts, each tailored for specific PDF-related tasks, this repository is your passport to PDF mastery. We've distilled complex processes into user-friendly tools to ensure your journey from massive PDFs to identifiable sub-documents is a breeze.
 
 **Key Features**:
+
 - 📘 Cleverly dissect vast PDFs into digestible sub-documents.
 - 🔍 Extract, classify, and interpret content using the power of NER.
 - 💡 Explore below for a detailed walkthrough of each utility.
@@ -64,7 +65,7 @@ The included NER scripts aim to enhance search engine optimization. Given the da
 ### **PDF Table of Contents Extractor**
 
 - **Function**: Extract the table of contents from a PDF, with an option to save to an Excel file.
-  
+
 ```bash
 python naive_section_finder.py <pdf_file> [--output-file output.xlsx]
 ```
@@ -72,7 +73,7 @@ python naive_section_finder.py <pdf_file> [--output-file output.xlsx]
 ### **PDF Document ID Extractor**
 
 - **Function**: Extract DocumentIDs (numeric or alphanumeric) from PDFs.
-  
+
 ```bash
 python find_document_id.py <pdf_file> [--output-file output.xlsx]
 ```
@@ -84,7 +85,7 @@ python find_document_id.py <pdf_file> [--output-file output.xlsx]
 - **Function**: Execute NER using Flair's pretrained models and measure NER performance.
 
 ```bash
-python ner-benchmark.py [--cuda]
+python ner-benchmark.py
 ```
 
 ### **Named Entity Recognition (NER) from PDFs**
@@ -92,7 +93,7 @@ python ner-benchmark.py [--cuda]
 - **Function**: Read a PDF and execute NER, saving results to either Excel or CSV.
 
 ```bash
-python ner.py <pdf_file> [--cuda] [--certainty 0.9] [--output-excel output.xlsx] [--output-csv output.csv]
+python ner.py <pdf_file> [--certainty 0.9] [--output-excel] [--output-csv] [--verbose]
 ```
 
 **For more details**, consult the [named entity recognition](named_entity_recognition.md) guide.
@@ -112,5 +113,5 @@ Woo Data Playground is open-source, abiding by the [European Union Public Licens
 
 ## **Contributing**
 
-"Got insights or found an issue? 🌟 Jump into our GitHub! Every idea and observation enriches our content. 
+Got insights or found an issue? 🌟 Jump into our GitHub! Every idea and observation enriches our content.
 Your voice makes all the difference.
