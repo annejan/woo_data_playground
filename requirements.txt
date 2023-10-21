@@ -6,4 +6,4 @@ transformers==4.30.0
 pandas==2.1.1
 asciichartpy==1.5.25
 tqdm==4.66.1
-
+pynvml==11.5.0

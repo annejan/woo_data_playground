@@ -1,43 +1,45 @@
 import time
-import torch
-import os
 from tqdm import tqdm
 import asciichartpy
+import pynvml
 
-def display_cuda_memory_usage():
-    """Return CUDA memory usage in GB."""
-    t = torch.cuda.get_device_properties(0).total_memory
-    r = torch.cuda.memory_reserved(0)
-    a = torch.cuda.memory_allocated(0)
+# Initialize NVIDIA GPU monitoring
+pynvml.nvmlInit()
+handle = pynvml.nvmlDeviceGetHandleByIndex(0)  # Assuming you are monitoring GPU 0
 
-    used_memory = a / (1024 ** 3)
-    return used_memory
+def get_gpu_memory():
+    """Retrieve the current GPU memory usage in MB"""
+    meminfo = pynvml.nvmlDeviceGetMemoryInfo(handle)
+    return meminfo.used / (1024**2)
 
-def monitor_cuda_memory_and_time_graph(duration=10, interval=1):
-    """Monitor CUDA memory and integrate with tqdm and asciichartpy."""
-
-    memory_values = []
-    progress_bar = tqdm(total=int(duration / interval), position=0, leave=True)
-
-    for _ in range(int(duration / interval)):
-        used_memory = display_cuda_memory_usage()
-        memory_values.append(used_memory)
-
-        _, console_width = os.get_terminal_size()
-        # Limit the plot to console width by dropping old values
-        while len(asciichartpy.plot(memory_values)) > console_width:
-            memory_values.pop(0)
-        
-        # Print memory graph to console
-        print("\033c")  # Clear the console
-        print(asciichartpy.plot(memory_values))
-        
-        # Update the progress bar
-        progress_bar.update(1)
-        progress_bar.refresh()
+def monitor_memory_usage(duration, interval):
+    """
+    Monitor memory usage over time.
+    
+    :param duration: Total time duration for monitoring (seconds)
+    :param interval: Time interval for each data collection (seconds)
+    :return: List of memory usage data points
+    """
+    data_points = []
+    num_iterations = int(duration / interval)
+    
+    for _ in tqdm(range(num_iterations), desc="Monitoring GPU memory", ncols=100):
+        mem_used = get_gpu_memory()
+        data_points.append(mem_used)
         time.sleep(interval)
 
-    progress_bar.close()
+    return data_points
 
-monitor_cuda_memory_and_time_graph(duration=30)
+if __name__ == "__main__":
+    # Collect memory usage data over 10 seconds with 1-second intervals
+    data = monitor_memory_usage(10, 1)
+    
+    # Clear the screen
+    print("\033[H\033[J")
+    
+    # Plot memory usage
+    print("Memory usage over time (in MB):\n")
+    print(asciichartpy.plot(data, {"height": 15}))
 
+# Shutdown NVIDIA GPU monitoring
+pynvml.nvmlShutdown()
