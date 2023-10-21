@@ -41,7 +41,7 @@ def process_entities(sentence, tagger, certainty, verbose):
     :return: dict, entities found in the sentence, with their count and tag.
     """
     entity_info = {}
-    if not sentence:
+    if not sentence.strip():
         return entity_info
     tagger.predict(sentence)
     for entity in sentence.get_spans("ner"):
