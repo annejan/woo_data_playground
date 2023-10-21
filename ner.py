@@ -35,7 +35,7 @@ from openpyxl import Workbook
 from tqdm import tqdm
 
 
-def is_meaningful_content(s: str, threshold: float = 0.0) -> bool:
+def is_meaningful_content(s: str, threshold: float = 0.2) -> bool:
     """
     Check if a string contains meaningful content.
 
