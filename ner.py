@@ -24,7 +24,6 @@ import argparse
 import csv
 import os
 import fitz  # PyMuPDF
-import flair
 import torch
 from flair.data import Sentence
 from flair.models import SequenceTagger
@@ -42,6 +41,8 @@ def process_entities(sentence, tagger, certainty, verbose):
     :return: dict, entities found in the sentence, with their count and tag.
     """
     entity_info = {}
+    if not sentence:
+        return entity_info
     tagger.predict(sentence)
     for entity in sentence.get_spans("ner"):
         if verbose:
@@ -164,10 +165,17 @@ def main():
 
     args = parser.parse_args()
 
+    if not 0 <= args.certainty <= 1:
+        print("Error: Certainty should be between 0 and 1.")
+        return
+
     for file_path in args.pdf_files:
         if not os.path.isfile(file_path):
             print(f"Error: The specified PDF file '{file_path}' does not exist.")
-            continue
+            return
+        if not file_path.lower().endswith('.pdf'):
+            print(f"Error: File '{file_path}' is not a valid PDF.")
+            return
 
     if torch.cuda.is_available():
         if args.verbose:
