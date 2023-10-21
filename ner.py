@@ -56,8 +56,8 @@ def process_entities(sentence, tagger, certainty, verbose):
                 )
                 entity_info[entity_text]["count"] += 1
         return entity_info
-    except RuntimeError as e:
-        print(f"Error in NER tagging: {e}")
+    except (RuntimeError, ValueError) as e:
+        print(f"Error in NER tagging: {e}\n{sentence}")
 
 
 def get_entities_from_pdf(pdf_file, tagger, certainty, verbose):
@@ -94,8 +94,8 @@ def get_entities_from_pdf(pdf_file, tagger, certainty, verbose):
                         entities[key]["count"] += value["count"]
                     else:
                         entities[key] = value
-    except RuntimeError as e:
-        print(f"Error processing PDF: {e}")
+    except (MemoryError, RuntimeError) as e:
+        print(f"Error processing PDF {pdf_file} page {page_num}: {e}")
     return entities
 
 
