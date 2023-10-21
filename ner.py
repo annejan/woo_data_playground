@@ -213,7 +213,7 @@ def main():
         for file_path in tqdm(
             args.pdf_files,
             desc="Processing files",
-            unit="files",
+            unit="file",
             disable=args.verbose,
             position=0,
         ):
