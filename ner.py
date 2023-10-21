@@ -104,7 +104,7 @@ def get_entities_from_pdf(pdf_file, tagger, certainty, verbose):
                     print(f"Page[{page_num}]")
                 page = doc[page_num]
                 text = page.get_text("text")
-                if not text.strip() and is_meaningful_content(text):
+                if not text.strip() or not is_meaningful_content(text):
                     continue
                 entities_page = process_entities(
                     Sentence(text), tagger, certainty, verbose
