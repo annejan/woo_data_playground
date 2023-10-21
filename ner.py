@@ -94,7 +94,7 @@ def get_entities_from_pdf(pdf_file, tagger, certainty, verbose):
                         entities[key]["count"] += value["count"]
                     else:
                         entities[key] = value
-    except (fitz.fitz.MemoryError, RuntimeError) as e:
+    except RuntimeError as e:
         print(f"Error processing PDF: {e}")
     return entities
 
