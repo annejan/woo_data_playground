@@ -89,11 +89,12 @@ def get_entities_from_pdf(pdf_file, tagger, certainty, verbose):
                 entities_page = process_entities(
                     Sentence(text), tagger, certainty, verbose
                 )
-                for key, value in entities_page.items():
-                    if key in entities:
-                        entities[key]["count"] += value["count"]
-                    else:
-                        entities[key] = value
+                if entities_page:
+                    for key, value in entities_page.items():
+                        if key in entities:
+                            entities[key]["count"] += value["count"]
+                        else:
+                            entities[key] = value
     except (MemoryError, RuntimeError) as e:
         print(f"Error processing PDF {pdf_file} page {page_num}: {e}")
     return entities
