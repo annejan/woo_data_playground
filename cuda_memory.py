@@ -8,15 +8,20 @@ import os
 pynvml.nvmlInit()
 handle = pynvml.nvmlDeviceGetHandleByIndex(0)
 
+
 def get_gpu_memory():
-    """Retrieve the current GPU memory usage in GB."""
+    """Retrieve the current GPU memory usage and total available GPU memory in GB."""
     meminfo = pynvml.nvmlDeviceGetMemoryInfo(handle)
-    return meminfo.used / (1024**3)  # Convert to GB
+    used_mem = meminfo.used / (1024**3)  # Convert to GB
+    total_mem = meminfo.total / (1024**3)  # Convert to GB
+    return used_mem, total_mem
+
 
 def console_size():
     """Retrieve the width and height of the console."""
     width, height = shutil.get_terminal_size((20, 50))
     return width, height
+
 
 def monitor_memory(interval=1):
     """Monitor and plot GPU memory usage in real-time."""
@@ -26,19 +31,24 @@ def monitor_memory(interval=1):
 
     try:
         while True:
-            mem_used = get_gpu_memory()
-            data_points.append(mem_used)
+            used_mem, total_mem = get_gpu_memory()
+            data_points.append(used_mem)
 
             _, height = console_size()  # Update height in case terminal is resized
-            os.system('cls' if os.name == 'nt' else 'clear')
-            print(asciichartpy.plot(list(data_points), {'height': height - 5}))  # Leaving some margin for plot labels
+            os.system("cls" if os.name == "nt" else "clear")
+            print(
+                asciichartpy.plot(list(data_points), {"height": height - 5})
+            )  # Leaving some margin for plot labels
+            print(
+                f"\nUsed Memory: {used_mem:.2f} GB | Free Memory: {total_mem - used_mem:.2f} GB | Total Memory: {total_mem:.2f} GB"
+            )
 
             time.sleep(interval)
     except KeyboardInterrupt:
         print("\nMonitoring stopped.")
 
+
 if __name__ == "__main__":
     monitor_memory()
 
 pynvml.nvmlShutdown()
-
