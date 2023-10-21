@@ -45,10 +45,15 @@ def is_meaningful_content(s: str, threshold: float = 0.0) -> bool:
     Returns:
     - bool: True if the string is meaningful, False otherwise.
     """
-    cleaned_string = re.sub(r'\s', '', s)
+    cleaned_string = re.sub(r"\s", "", s)
     meaningful_chars = sum(
-        1 for char in cleaned_string if char in string.ascii_letters + string.digits + string.punctuation)
-    proportion_meaningful = meaningful_chars / len(cleaned_string) if cleaned_string else 0
+        1
+        for char in cleaned_string
+        if char in string.ascii_letters + string.digits + string.punctuation
+    )
+    proportion_meaningful = (
+        meaningful_chars / len(cleaned_string) if cleaned_string else 0
+    )
     return proportion_meaningful >= threshold
 
 
