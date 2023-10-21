@@ -6,15 +6,14 @@ It extracts named entities, such as persons, organizations and locations, with a
 It can write the results to an Excel file, a CSV file, or just print them to the console.
 
 Usage:
-    python ner.py <pdf_file> [--cuda] [--certainty <certainty>] [--output-excel <output_excel>] [--output-csv <output_csv>]
+    python ner.py <pdf_files> [--certainty <certainty>] [--output-excel <output_excel>] [--output-csv <output_csv>]
 
 Arguments:
-    pdf/file: Path to the PDF file to read and analyze for named entities.
-    --cuda: (Optional) Use CUDA for NER (if available).
+    pdf files: Paths to the PDF files to read and analyze for named entities.
     --certainty: (Optional) Minimum certainty for entities (default: 0.9).
-    --output-excel: (Optional) Path to the output Excel file.
-    --output-csv: (Optional) Path to the output CSV file.
-    --verbose: (Optional) print some more info while working.
+    --output-excel: (Optional) Output Excel file(s).
+    --output-csv: (Optional) Output CSV file(s).
+    --verbose: (Optional) Print some more info while working.
 
 Example:
     python ner.py document.pdf --cuda --certainty 0.8 --output-excel entities.xlsx --output-csv entities.csv
@@ -30,6 +29,7 @@ import torch
 from flair.data import Sentence
 from flair.models import SequenceTagger
 from openpyxl import Workbook
+from tqdm import tqdm
 
 
 def process_entities(sentence, tagger, certainty, verbose):
@@ -64,12 +64,18 @@ def get_entities_from_pdf(pdf_file, tagger, certainty, verbose):
     :param pdf_file: str, path to the PDF file to process.
     :param tagger: flair.models.SequenceTagger, the Flair NER tagger model.
     :param certainty: float, optional, the minimum score required to consider an entity. Default is 0.9.
-    :param verbose: hush hush ..
+    :param verbose: Not hush hush ..
     :return: dict, entities found in the PDF, with their count and tag.
     """
     entities = {}
     with fitz.open(pdf_file) as doc:
-        for page_num in range(len(doc)):
+        for page_num in tqdm(
+            range(len(doc)),
+            desc="Processing pages",
+            unit="pages",
+            disable=verbose,
+            position=1,
+        ):
             if verbose:
                 print(f"Page[{page_num}]")
             page = doc[page_num]
@@ -126,7 +132,7 @@ def main():
     parser = argparse.ArgumentParser(
         description="Read a PDF file and perform Named Entity Recognition (NER)."
     )
-    parser.add_argument("pdf_file", help="Path to the PDF file to read.")
+    parser.add_argument("pdf_files", nargs="+", help="Paths to the PDF files to read.")
     parser.add_argument(
         "--cuda", action="store_true", help="Use CUDA for NER (if available)."
     )
@@ -140,14 +146,14 @@ def main():
     parser.add_argument(
         "--output-excel",
         "-x",
-        required=False,
-        help="Path to the output Excel file.",
+        action="store_true",
+        help="Output Excel file(s).",
     )
     parser.add_argument(
         "--output-csv",
         "-o",
-        required=False,
-        help="Path to the output CSV file.",
+        action="store_true",
+        help="Output CSV file(s).",
     )
     parser.add_argument(
         "--verbose",
@@ -157,34 +163,58 @@ def main():
     )
 
     args = parser.parse_args()
-    pdf_file_path = args.pdf_file
-    if not os.path.isfile(pdf_file_path):
-        print(f"Error: The specified PDF file '{pdf_file_path}' does not exist.")
-        return
 
-    if args.cuda:
-        flair.device = torch.device("cuda")
+    for file_path in args.pdf_files:
+        if not os.path.isfile(file_path):
+            print(f"Error: The specified PDF file '{file_path}' does not exist.")
+            continue
+
+    if torch.cuda.is_available():
+        if args.verbose:
+            print("CUDA is available!")
+        torch.device("cuda")
     else:
-        flair.device = torch.device("cpu")
+        if args.verbose:
+            print("CUDA is not available. Using CPU...")
+        torch.device("cpu")
 
     model = "flair/ner-dutch-large"
     if args.verbose:
         print(f"Loading {model}")
     tagger = SequenceTagger.load(model)
-    entities = get_entities_from_pdf(args.pdf_file, tagger, args.certainty, args.verbose)
-    sorted_entities = sorted(
-        entities.items(), key=lambda x: x[1]["count"], reverse=True
-    )
 
-    if args.output_excel:
-        write_to_excel(sorted_entities, args.output_excel)
+    for file_path in tqdm(
+        args.pdf_files,
+        desc="Processing files",
+        unit="files",
+        disable=args.verbose,
+        position=0,
+    ):
         if args.verbose:
-            print(f"Data has been written to {args.output_excel}")
+            print(f"Processing {file_path}")
+        entities = get_entities_from_pdf(
+            file_path, tagger, args.certainty, args.verbose
+        )
+        sorted_entities = sorted(
+            entities.items(), key=lambda x: x[1]["count"], reverse=True
+        )
 
-    if args.output_csv:
-        write_to_csv(sorted_entities, args.output_csv)
-        if args.verbose:
-            print(f"Data has been written to {args.output_csv}")
+        # Create a unique output name based on the PDF file name
+        if args.output_excel:
+            output_excel = f"{os.path.splitext(file_path)[0]}.ner.xlsx"
+            write_to_excel(sorted_entities, output_excel)
+            if args.verbose:
+                print(f"Data for {file_path} has been written to {output_excel}")
+
+        if args.output_csv:
+            output_csv = f"{os.path.splitext(file_path)[0]}.ner.csv"
+            write_to_csv(sorted_entities, output_csv)
+            if args.verbose:
+                print(f"Data for {file_path} has been written to {output_csv}")
+
+        if not args.output_csv and not args.output_excel:
+            for entity in sorted_entities:
+                print(entity)
 
 
 if __name__ == "__main__":

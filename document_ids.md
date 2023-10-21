@@ -1,7 +1,7 @@
 # PDF Document Number Extractor
 
 This Python script allows you to extract document IDs (number or number letter combination) from a PDF file.
-It can locate and extract information based on a specified viewbox or use a default viewbox if none is provided.
+It can locate and extract information based on a specified viewbox or use a top right viewbox if none is provided.
 The script uses the PyMuPDF library to handle PDF files and Tesseract for Optical Character Recognition (OCR) when necessary.
 
 ## Prerequisites

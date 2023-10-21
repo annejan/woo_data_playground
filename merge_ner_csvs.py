@@ -33,7 +33,9 @@ def combine_and_sort_csv(file_names, output_file, sort_column, sort_direction):
     # Concatenate dataframes
     combined_df = pd.concat(dataframes, ignore_index=True)
     # Group by 'Text' and 'Tag' columns and aggregate their counts
-    combined_df = combined_df.groupby(['Text', 'Tag'], as_index=False).agg({'Count': 'sum'})
+    combined_df = combined_df.groupby(["Text", "Tag"], as_index=False).agg(
+        {"Count": "sum"}
+    )
 
     if sort_column:
         combined_df = combined_df.sort_values(

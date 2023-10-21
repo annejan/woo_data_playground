@@ -6,18 +6,12 @@ import time
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Perform Named Entity Recognition (NER) using CUDA (if available)."
-    )
-    parser.add_argument(
-        "--cuda", action="store_true", help="Use CUDA for NER (if available)."
-    )
-    args = parser.parse_args()
-
-    if args.cuda:
-        flair.device = torch.device("cuda")
+    if torch.cuda.is_available():
+        print("CUDA is available!")
+        torch.device("cuda")
     else:
-        flair.device = torch.device("cpu")
+        print("CUDA is not available. Using CPU...")
+        torch.device("cpu")
 
     text = """
 @rive. ni};IEEEEET @rivm. ni]

@@ -26,7 +26,7 @@ Before you can use this script, you need to have the following prerequisites ins
 
 ### Installing PyMuPDF (fitz), Flair, Pandas and OpenPyXL
 
-You can install the PyMuPDF and OpenPyXL libraries using pip:
+You can install all the required libraries using `pip`.
 
 ```bash
 pip install -r requirements.txt
@@ -89,7 +89,7 @@ It allows you to evaluate NER performance using CUDA (if available) and provides
 **Usage:**
 
 ```bash
-python ner-benchmark.py [--cuda]
+python ner-benchmark.py
 ```
 
 ## Named Entity Recognition (NER) from PDFs
@@ -101,7 +101,7 @@ It extracts entities with a specified minimum certainty and provides the option 
 **Usage:**
 
 ```bash
-python ner.py <pdf_file> [--cuda] [--certainty 0.9] [--output-excel output.xlsx] [--output-csv output.csv]
+python ner.py <pdf_file> [--certainty 0.9] [--output-excel] [--output-csv] [--verbose]
 ```
 
 For more information read the [named entity recognition](named_entity_recognition.md) documentation.

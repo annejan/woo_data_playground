@@ -6,6 +6,14 @@ Below, you'll find descriptions and usage instructions for each NER script.
 
 By default, the script uses the [flair/ner-dutch-large](https://huggingface.co/flair/ner-dutch-large) model.
 
+## Dependencies:
+
+Ensure you have all required libraries installed. You can do this using `pip`:
+
+```bash
+pip install PyMuPDF flair openpyxl tqdm****
+```
+
 ## Named Entity Recognition (NER) Benchmark
 
 **Description:**
@@ -15,24 +23,25 @@ It allows you to evaluate NER performance using CUDA (if available) and provides
 **Usage:**
 
 ```bash
-python ner-benchmark.py [--cuda]
+python ner-benchmark.py
 ```
 
 ## Named Entity Recognition (NER) from PDFs
 
 **Description:**
-This script reads a PDF file and performs Named Entity Recognition (NER) using Flair's pre-trained NER models. It extracts entities with a specified minimum certainty and provides the option to save the results to an Excel or CSV file.
+This script reads a PDF file and performs Named Entity Recognition (NER) using Flair's pre-trained NER models.
+It extracts entities with a specified minimum certainty and provides the option to save the results to an Excel or CSV file.
 
 **Usage:**
 
 ```bash
-python ner.py <pdf_file> [--cuda] [--certainty 0.9] [--output-excel output.xlsx] [--output-csv output.csv]
+python ner.py <pdf_file> [--certainty 0.9] [--output-excel] [--output-csv]
 ```
 
 Practical usage:
 
 ```bash
-for pdf in data/*/*.pdf; do python ner.py --cuda --output-csv ${pdf//.pdf/.ner.csv}; done
+python ner.py --cuda --output-csv data/*/*.pdf
 ```
 
 ## Combine and Sort NER Results
