@@ -27,6 +27,7 @@ import fitz  # PyMuPDF
 import torch
 from flair.data import Sentence
 from flair.models import SequenceTagger
+import openpyxl
 from openpyxl import Workbook
 from tqdm import tqdm
 
@@ -41,19 +42,22 @@ def process_entities(sentence, tagger, certainty, verbose):
     :return: dict, entities found in the sentence, with their count and tag.
     """
     entity_info = {}
-    tagger.predict(sentence)
-    for entity in sentence.get_spans("ner"):
-        if verbose:
-            print(entity)
-        label = entity.get_labels()[0]
-        if label.score >= certainty and label.value != "MISC":
-            entity_text = entity.text
-            entity_tag = label.value
-            entity_info[entity_text] = entity_info.get(
-                entity_text, {"tag": entity_tag, "count": 0}
-            )
-            entity_info[entity_text]["count"] += 1
-    return entity_info
+    try:
+        tagger.predict(sentence)
+        for entity in sentence.get_spans("ner"):
+            if verbose:
+                print(entity)
+            label = entity.get_labels()[0]
+            if label.score >= certainty and label.value != "MISC":
+                entity_text = entity.text
+                entity_tag = label.value
+                entity_info[entity_text] = entity_info.get(
+                    entity_text, {"tag": entity_tag, "count": 0}
+                )
+                entity_info[entity_text]["count"] += 1
+        return entity_info
+    except RuntimeError as e:
+        print(f"Error in NER tagging: {e}")
 
 
 def get_entities_from_pdf(pdf_file, tagger, certainty, verbose):
@@ -67,26 +71,31 @@ def get_entities_from_pdf(pdf_file, tagger, certainty, verbose):
     :return: dict, entities found in the PDF, with their count and tag.
     """
     entities = {}
-    with fitz.open(pdf_file) as doc:
-        for page_num in tqdm(
-            range(len(doc)),
-            desc="Processing pages",
-            unit="pages",
-            disable=verbose,
-            position=1,
-        ):
-            if verbose:
-                print(f"Page[{page_num}]")
-            page = doc[page_num]
-            text = page.get_text("text")
-            if not text.strip():
-                continue
-            entities_page = process_entities(Sentence(text), tagger, certainty, verbose)
-            for key, value in entities_page.items():
-                if key in entities:
-                    entities[key]["count"] += value["count"]
-                else:
-                    entities[key] = value
+    try:
+        with fitz.open(pdf_file) as doc:
+            for page_num in tqdm(
+                range(len(doc)),
+                desc="Processing pages",
+                unit="pages",
+                disable=verbose,
+                position=1,
+            ):
+                if verbose:
+                    print(f"Page[{page_num}]")
+                page = doc[page_num]
+                text = page.get_text("text")
+                if not text.strip():
+                    continue
+                entities_page = process_entities(
+                    Sentence(text), tagger, certainty, verbose
+                )
+                for key, value in entities_page.items():
+                    if key in entities:
+                        entities[key]["count"] += value["count"]
+                    else:
+                        entities[key] = value
+    except (fitz.fitz.MemoryError, RuntimeError) as e:
+        print(f"Error processing PDF: {e}")
     return entities
 
 
@@ -105,11 +114,14 @@ def write_to_excel(sorted_entities, output_file):
     sheet["A1"] = "Text"
     sheet["B1"] = "Tag"
     sheet["C1"] = "Count"
-    for i, (entity_text, info) in enumerate(sorted_entities, start=2):
-        sheet[f"A{i}"] = entity_text
-        sheet[f"B{i}"] = info["tag"]
-        sheet[f"C{i}"] = info["count"]
-    workbook.save(output_file)
+    try:
+        for i, (entity_text, info) in enumerate(sorted_entities, start=2):
+            sheet[f"A{i}"] = entity_text
+            sheet[f"B{i}"] = info["tag"]
+            sheet[f"C{i}"] = info["count"]
+        workbook.save(output_file)
+    except (PermissionError, openpyxl.utils.exceptions.IllegalCharacterError) as e:
+        print(f"Error writing to Excel: {e}")
 
 
 def write_to_csv(sorted_entities, output_file):
@@ -121,11 +133,14 @@ def write_to_csv(sorted_entities, output_file):
                             second item is a dictionary with entity details (e.g., tag and count).
     :param output_file: str, path to the output CSV file.
     """
-    with open(output_file, mode="w", newline="") as csv_file:
-        writer = csv.writer(csv_file)
-        writer.writerow(["Text", "Tag", "Count"])
-        for entity_text, info in sorted_entities:
-            writer.writerow([entity_text, info["tag"], info["count"]])
+    try:
+        with open(output_file, mode="w", newline="") as csv_file:
+            writer = csv.writer(csv_file)
+            writer.writerow(["Text", "Tag", "Count"])
+            for entity_text, info in sorted_entities:
+                writer.writerow([entity_text, info["tag"], info["count"]])
+    except (PermissionError, csv.Error) as e:
+        print(f"Error writing to CSV: {e}")
 
 
 def main():
@@ -186,42 +201,48 @@ def main():
         torch.device("cpu")
 
     model = "flair/ner-dutch-large"
-    if args.verbose:
-        print(f"Loading {model}")
-    tagger = SequenceTagger.load(model)
-
-    for file_path in tqdm(
-        args.pdf_files,
-        desc="Processing files",
-        unit="files",
-        disable=args.verbose,
-        position=0,
-    ):
+    try:
         if args.verbose:
-            print(f"Processing {file_path}")
-        entities = get_entities_from_pdf(
-            file_path, tagger, args.certainty, args.verbose
-        )
-        sorted_entities = sorted(
-            entities.items(), key=lambda x: x[1]["count"], reverse=True
-        )
-
-        # Create a unique output name based on the PDF file name
-        if args.output_excel:
-            output_excel = f"{os.path.splitext(file_path)[0]}.ner.xlsx"
-            write_to_excel(sorted_entities, output_excel)
+            print(f"Loading {model}")
+        tagger = SequenceTagger.load(model)
+    except (FileNotFoundError, torch.serialization.pickle.UnpicklingError) as e:
+        print(f"Error loading the NER model: {e}")
+        return
+    try:
+        for file_path in tqdm(
+            args.pdf_files,
+            desc="Processing files",
+            unit="files",
+            disable=args.verbose,
+            position=0,
+        ):
             if args.verbose:
-                print(f"Data for {file_path} has been written to {output_excel}")
+                print(f"Processing {file_path}")
+            entities = get_entities_from_pdf(
+                file_path, tagger, args.certainty, args.verbose
+            )
+            sorted_entities = sorted(
+                entities.items(), key=lambda x: x[1]["count"], reverse=True
+            )
 
-        if args.output_csv:
-            output_csv = f"{os.path.splitext(file_path)[0]}.ner.csv"
-            write_to_csv(sorted_entities, output_csv)
-            if args.verbose:
-                print(f"Data for {file_path} has been written to {output_csv}")
+            # Create a unique output name based on the PDF file name
+            if args.output_excel:
+                output_excel = f"{os.path.splitext(file_path)[0]}.ner.xlsx"
+                write_to_excel(sorted_entities, output_excel)
+                if args.verbose:
+                    print(f"Data for {file_path} has been written to {output_excel}")
 
-        if not args.output_csv and not args.output_excel:
-            for entity in sorted_entities:
-                print(entity)
+            if args.output_csv:
+                output_csv = f"{os.path.splitext(file_path)[0]}.ner.csv"
+                write_to_csv(sorted_entities, output_csv)
+                if args.verbose:
+                    print(f"Data for {file_path} has been written to {output_csv}")
+
+            if not args.output_csv and not args.output_excel:
+                for entity in sorted_entities:
+                    print(entity)
+    except RuntimeError as e:
+        print(f"Error processing PDF: {e}")
 
 
 if __name__ == "__main__":
