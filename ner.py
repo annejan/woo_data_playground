@@ -41,8 +41,6 @@ def process_entities(sentence, tagger, certainty, verbose):
     :return: dict, entities found in the sentence, with their count and tag.
     """
     entity_info = {}
-    if not sentence.strip():
-        return entity_info
     tagger.predict(sentence)
     for entity in sentence.get_spans("ner"):
         if verbose:
@@ -80,14 +78,16 @@ def get_entities_from_pdf(pdf_file, tagger, certainty, verbose):
             if verbose:
                 print(f"Page[{page_num}]")
             page = doc[page_num]
-            entities_page = process_entities(
-                Sentence(page.get_text("text")), tagger, certainty, verbose
-            )
-            for key, value in entities_page.items():
-                if key in entities:
-                    entities[key]["count"] += value["count"]
-                else:
-                    entities[key] = value
+            text = page.get_text("text")
+            if text.strip():
+                entities_page = process_entities(
+                    Sentence(text), tagger, certainty, verbose
+                )
+                for key, value in entities_page.items():
+                    if key in entities:
+                        entities[key]["count"] += value["count"]
+                    else:
+                        entities[key] = value
     return entities
 
 
@@ -173,7 +173,7 @@ def main():
         if not os.path.isfile(file_path):
             print(f"Error: The specified PDF file '{file_path}' does not exist.")
             return
-        if not file_path.lower().endswith('.pdf'):
+        if not file_path.lower().endswith(".pdf"):
             print(f"Error: File '{file_path}' is not a valid PDF.")
             return
 
