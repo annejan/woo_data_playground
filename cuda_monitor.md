@@ -1,10 +1,10 @@
-# GPU Memory Monitor
+# GPU Monitor
 
-Monitor your GPU memory usage in real-time with an ASCII-based console graph.
+Monitor your GPU memory usage and utilization in real-time with an ASCII-based console graph.
 
 ## Overview
 
-This script provides a real-time plot of your GPU's memory usage right in the terminal. It leverages NVIDIA's Management Library (NVML) to fetch memory usage statistics and presents them with a dynamic ASCII chart. It also displays used, free, and total memory statistics below the chart.
+This script provides a real-time plot of your GPU's memory usage percentage and utilization right in the terminal. It leverages NVIDIA's Management Library (NVML) to fetch these statistics and presents them with a dynamic ASCII chart. Below the chart, it displays the statistics for used, free, and total GPU memory, as well as GPU utilization in percentage.
 
 ## Prerequisites
 
@@ -25,22 +25,22 @@ This script provides a real-time plot of your GPU's memory usage right in the te
     python cuda_memory.py
     ```
 
-   To customize the memory check interval (in seconds):
+   To customize the interval (in seconds) between updates:
 
     ```bash
     python cuda_memory.py --interval_seconds 2.5
     ```
 
-   This would check the memory every 2.5 seconds. If you don't provide the `--interval_seconds` argument, it will default to 1 second.
+   This would refresh the data every 2.5 seconds. If you don't provide the `--interval_seconds` argument, it will default to 1 second.
 
-3. The GPU memory usage will be plotted in real-time in your terminal. Below the chart, you will find the statistics for used, free, and total GPU memory.
+3. GPU memory usage percentage and GPU utilization will be plotted in real-time in your terminal. Below the chart, you will find the statistics for used, free, and total GPU memory, along with GPU utilization.
 4. To stop the monitoring, press `CTRL+C`.
 
 ## Features
 
-- Real-time GPU memory monitoring with customizable interval.
+- Real-time GPU memory and utilization monitoring with a customizable interval.
 - Dynamic chart that adapts to console width and height.
-- Displays used, free, and total GPU memory statistics.
+- Displays used, free, and total GPU memory statistics along with GPU utilization.
 
 ## Acknowledgements
 
