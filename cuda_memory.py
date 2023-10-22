@@ -1,3 +1,4 @@
+import argparse
 import time
 from collections import deque
 import pynvml
@@ -49,6 +50,18 @@ def monitor_memory(interval=1):
 
 
 if __name__ == "__main__":
-    monitor_memory()
+    parser = argparse.ArgumentParser(
+        description="Monitor GPU memory usage in real-time."
+    )
+    parser.add_argument(
+        "--interval_seconds",
+        "-s",
+        type=float,
+        default=1,
+        help="Interval in seconds between memory checks.",
+    )
+    args = parser.parse_args()
+
+    monitor_memory(args.interval_seconds)
 
 pynvml.nvmlShutdown()

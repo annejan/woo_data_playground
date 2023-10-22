@@ -38,10 +38,11 @@ from tqdm import tqdm
 def is_meaningful_content(s: str, threshold: float = 0.2) -> bool:
     """
     Check if a string contains meaningful content.
+    Normal pages are in the 0.99 range on tested collection.
 
     Parameters:
     - s (str): Input string to check.
-    - threshold (float): Proportion of meaningful characters required.
+    - threshold (float): Proportion of meaningful characters required. Default is 0.2
 
     Returns:
     - bool: True if the string is meaningful, False otherwise.
