@@ -52,7 +52,7 @@ def monitor_gpu_stats(interval=1):
             print(
                 asciichartpy.plot(
                     [list(memory_points), list(utilization_points)],
-                    {"height": (height - 5) // 2},
+                    {"height": height - 5},
                 )
             )
 
