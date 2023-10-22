@@ -25,14 +25,22 @@ This script provides a real-time plot of your GPU's memory usage right in the te
     python cuda_memory.py
     ```
 
+   To customize the memory check interval (in seconds):
+
+    ```bash
+    python cuda_memory.py --interval_seconds 2.5
+    ```
+
+   This would check the memory every 2.5 seconds. If you don't provide the `--interval_seconds` argument, it will default to 1 second.
+
 3. The GPU memory usage will be plotted in real-time in your terminal. Below the chart, you will find the statistics for used, free, and total GPU memory.
 4. To stop the monitoring, press `CTRL+C`.
 
 ## Features
 
-- Real-time GPU memory monitoring
-- Dynamic chart that adapts to console width and height
-- Displays used, free, and total GPU memory statistics
+- Real-time GPU memory monitoring with customizable interval.
+- Dynamic chart that adapts to console width and height.
+- Displays used, free, and total GPU memory statistics.
 
 ## Acknowledgements
 
