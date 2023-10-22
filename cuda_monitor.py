@@ -40,7 +40,7 @@ def monitor_memory(interval=1):
         while True:
             used_mem, total_mem = get_gpu_memory()
             gpu_utilization = get_gpu_utilization()
-            data_points.append(used_mem)
+            data_points.append((used_mem / total_mem) * 100)
             utilization_points.append(gpu_utilization)
 
             _, height = console_size()  # Update height in case terminal is resized
