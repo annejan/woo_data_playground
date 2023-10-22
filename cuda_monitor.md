@@ -4,7 +4,9 @@ Monitor your GPU memory usage and utilization in real-time with an ASCII-based c
 
 ## Overview
 
-This script provides a real-time plot of your GPU's memory usage percentage and utilization right in the terminal. It leverages NVIDIA's Management Library (NVML) to fetch these statistics and presents them with a dynamic ASCII chart. Below the chart, it displays the statistics for used, free, and total GPU memory, as well as GPU utilization in percentage.
+This script provides a real-time plot of your GPU's memory usage percentage and utilization right in the terminal.
+It leverages NVIDIA's Management Library (NVML) to fetch these statistics and presents them with a dynamic ASCII chart.
+Below the chart, it displays the statistics for used, free, and total GPU memory, as well as GPU utilization in percentage.
 
 ## Prerequisites
 

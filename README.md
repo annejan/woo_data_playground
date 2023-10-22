@@ -106,6 +106,20 @@ python ner.py <pdf_file> [--certainty 0.9] [--output-excel] [--output-csv] [--ve
 
 For more information read the [named entity recognition](named_entity_recognition.md) documentation.
 
+## NVIDIA GPU Monitor
+
+**Description:**
+This script provides a real-time plot of your GPU's memory usage percentage and utilization right in the terminal.
+Below the chart, it displays the statistics for used, free, and total GPU memory, as well as GPU utilization in percentage.
+
+**Usage:**
+
+```bash
+python cuda_memory.py [--interval_seconds 2.5]
+```
+
+For more information read the [CUDA Monitor](cuda_monitor.md) documentation.
+
 ## Combine and Sort CSV Files
 
 **Description:**
