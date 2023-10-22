@@ -67,7 +67,23 @@ Please follow the usage instructions for each script to perform NER on your text
 
 ## Memory usage
 
-Currently, this script uses about 4 GB of memory, to check the active memory usage you can use the nifty [CUDA memory](cuda_memory.md) monitor. 
+Currently, this script uses about 4 to 6 GB of video memory, to check the active memory usage you can use the nifty [CUDA monitor](cuda_monitor.md). 
+
+## Acknowledgements
+
+This script relies on several open-source libraries to efficiently and effectively perform its operations:
+
+1. [**Flair**](https://github.com/flairNLP/flair): A state-of-the-art NLP library that offers various pre-trained models for NER and other NLP tasks. The script utilizes Flair for performing Named Entity Recognition on the extracted text from the PDFs.
+  
+2. [**PyMuPDF (fitz)**](https://github.com/pymupdf/PyMuPDF): A Python binding to the MuPDF library, used for reading content from PDF files. The script depends on this library to extract text from the given PDFs before NER is performed.
+
+3. [**Torch**](https://pytorch.org/): An open-source machine learning library. This script benefits from Torch's capabilities, especially for leveraging GPU computations when available, to speed up the NER process.
+
+4. [**openpyxl**](https://openpyxl.readthedocs.io/): A Python library to read and write Excel (xlsx) files. The script uses this library to save the extracted named entities to Excel format when requested.
+
+5. [**tqdm**](https://github.com/tqdm/tqdm): A Python library that provides immediate visual feedback in the form of a progress bar when running loops. This script uses tqdm to give the user feedback on the progress of PDF processing.
+
+The creators and maintainers of these libraries have our sincere gratitude for their efforts in the open-source community, enabling developers to build upon their hard work and further the field of Natural Language Processing and Data Analysis.
 
 ## License
 
