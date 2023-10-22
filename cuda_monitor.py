@@ -46,13 +46,10 @@ def monitor_memory(interval=1):
             _, height = console_size()  # Update height in case terminal is resized
             os.system("cls" if os.name == "nt" else "clear")
 
-            # Plot GPU usage in GB
-            print(asciichartpy.plot(list(data_points), {"height": (height - 5) // 2}))
-
-            # Plot GPU utilization as a percentage
             print(
                 asciichartpy.plot(
-                    list(utilization_points), {"height": (height - 5) // 2}
+                    [list(data_points), list(utilization_points)],
+                    {"height": (height - 5) // 2},
                 )
             )
 
