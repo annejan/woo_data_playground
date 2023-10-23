@@ -7,3 +7,6 @@ pandas==2.1.1
 asciichartpy==1.5.25
 tqdm==4.66.1
 pynvml==11.5.0
+opencv-python==4.8.1.78
+pytesseract==0.3.10
+pdf2image==1.16.3
