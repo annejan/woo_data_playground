@@ -77,7 +77,7 @@ def extract_text_from_pdf(page, page_number, rect, dump):
     Extract text from a specified region of a PDF page.
 
     Args:
-        pdf_document (fitz.Document): The PDF document object.
+        page (fitz.Page): The PDF document object.
         page_number (int): The page number to extract text from.
         rect (fitz.Rect): The rectangular region to extract text from.
 
