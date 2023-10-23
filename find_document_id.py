@@ -72,7 +72,7 @@ def extract_text_from_image(image_bytes):
     return rc.stdout.decode()
 
 
-def extract_text_from_pdf(pdf_document, page_number, rect, dump):
+def extract_text_from_pdf(page, page_number, rect, dump):
     """
     Extract text from a specified region of a PDF page.
 
@@ -84,10 +84,10 @@ def extract_text_from_pdf(pdf_document, page_number, rect, dump):
     Returns:
         str: The extracted text from the PDF page.
     """
-    page = pdf_document[page_number]
     text = page.get_textbox(rect)
     if dump:
-        pix = page.get_pixmap(clip=rect)
+        mat = fitz.Matrix(300.0 / 72.0, 300.0 / 72.0)
+        pix = page.get_pixmap(clip=rect, matrix=mat)
         pix.save(f"{page_number:04d}.png")
     return text
 
@@ -114,18 +114,18 @@ def write_to_excel(output_data, output_file):
     workbook.save(output_file)
 
 
-def process_page(pdf_document, viewbox):
+def process_page(page, viewbox):
     """
     Process the viewbox coordinates to create a fitz.Rect object.
 
     Args:
-        pdf_document (fitz.Document): The PDF document object.
+        page (fitz.Page): The PDF document object.
         viewbox (list): The viewbox coordinates [left, top, right, bottom].
 
     Returns:
         fitz.Rect: The fitz.Rect object representing the processed viewbox.
     """
-    width, height = pdf_document[0].mediabox_size
+    width, height = page.mediabox_size
     left, top, right, bottom = viewbox
 
     if left < 0:
@@ -194,8 +194,9 @@ def extract_pdf_data(pdf_file_path, viewbox, minumum, maximum, dump):
     try:
         with fitz.open(pdf_file_path) as pdf_document:
             for page_number in range(pdf_document.page_count):
-                rect = process_page(pdf_document, viewbox)
-                text = extract_text_from_pdf(pdf_document, page_number, rect, dump)
+                page = pdf_document[page_number]
+                rect = process_page(page, viewbox)
+                text = extract_text_from_pdf(page, page_number, rect, dump)
                 match = re.search(r"\d+[A-Za-z]*", text)
                 if match:
                     doc_id = match.group()
@@ -204,7 +205,8 @@ def extract_pdf_data(pdf_file_path, viewbox, minumum, maximum, dump):
                         output_data.append((doc_id, page_number + 1))
                         print(f"Document: {doc_id}\ton page: {page_number + 1}")
                 else:
-                    pix = pdf_document[page_number].get_pixmap(clip=rect)
+                    mat = fitz.Matrix(300.0 / 72.0, 300.0 / 72.0)
+                    pix = pdf_document[page_number].get_pixmap(clip=rect, matrix=mat)
                     text = extract_text_from_image(pix.tobytes("png"))
                     match = re.search(r"\d+[A-Za-z]*", text)
                     if match:
