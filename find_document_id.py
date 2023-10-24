@@ -125,7 +125,7 @@ def process_page(page, viewbox):
     Returns:
         fitz.Rect: The fitz.Rect object representing the processed viewbox.
     """
-    width, height = page.mediabox_size
+    width, height = page.rect.width, page.rect.height
     left, top, right, bottom = viewbox
 
     if left < 0:
