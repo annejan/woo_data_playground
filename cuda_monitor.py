@@ -1,3 +1,19 @@
+"""
+This script provides a real-time GPU memory usage and GPU utilization monitoring tool,
+displayed in the terminal using ASCII charts. It fetches GPU statistics at regular
+intervals and plots them, updating the terminal to provide a live view.
+
+This tool requires the `pynvml` and `asciichartpy` libraries.
+
+Usage:
+python cuda_monitor.py [--interval_seconds/-s <seconds>]
+
+Arguments:
+- --interval_seconds/-s: Interval in seconds between memory percentage checks and GPU utilization checks. (default is 1 second)
+
+The script will keep running until interrupted using a KeyboardInterrupt (typically Ctrl+C).
+"""
+
 import argparse
 import time
 from collections import deque
@@ -31,7 +47,12 @@ def terminal_dimensions():
 
 
 def monitor_gpu_stats(interval=1):
-    """Monitor and plot GPU memory usage percentage and utilization in real-time."""
+    """
+    Monitor and plot GPU memory usage percentage and utilization in real-time.
+
+    Args:
+    - interval (float): Time interval (in seconds) between fetching the statistics and updating the terminal.
+    """
     width, height = terminal_dimensions()
     memory_points = deque(maxlen=width - 20)
     utilization_points = deque(maxlen=width - 20)
@@ -57,7 +78,8 @@ def monitor_gpu_stats(interval=1):
             )
 
             print(
-                f"\nUsed Memory: {used_memory:.2f} GB | Free Memory: {total_memory - used_memory:.2f} GB | Total Memory: {total_memory:.2f} GB | GPU Utilization: {gpu_usage}%"
+                f"\nUsed Memory: {used_memory:.2f} GB | Free Memory: {total_memory - used_memory:.2f} GB | "
+                f"Total Memory: {total_memory:.2f} GB | GPU Utilization: {gpu_usage}%"
             )
 
             time.sleep(interval)

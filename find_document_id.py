@@ -339,6 +339,7 @@ def main():
     )
     parser.add_argument(
         "--output-file",
+        "-o",
         required=False,
         help="Specify the output Excel file",
     )

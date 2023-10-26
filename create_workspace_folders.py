@@ -1,3 +1,23 @@
+"""
+This script reads directory paths and associated IDs from a given CSV file.
+For each directory specified in the CSV file:
+
+1. It ensures a 'workspaces' directory exists.
+2. Creates a new directory inside 'workspaces' with a name based on the ID from the CSV.
+3. Checks the specified directory for a file named 'pdfs.txt' and copies it to the newly created folder.
+4. Copies all .xlsx files from the specified directory to the newly created folder.
+
+CSV file format:
+- Expected headers: "id", "folder"
+- Example content:
+    id, folder
+    1, /path/to/folder1
+    2, /path/to/folder2
+
+Usage:
+python create_workspace_folders.py <path_to_csv_file>
+"""
+
 import csv
 import os
 import sys
@@ -6,6 +26,12 @@ import glob
 
 
 def main(csv_filepath):
+    """
+    Process the given CSV file to copy directories and files as per the defined behavior.
+
+    Args:
+    - csv_filepath (str): Path to the CSV file containing directory paths and associated IDs.
+    """
     # Ensure 'workspaces' directory exists
     if not os.path.exists("workspaces"):
         os.makedirs("workspaces")
@@ -40,7 +66,7 @@ def main(csv_filepath):
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("Usage: python script_name.py <path_to_csv_file>")
+        print("Usage: python create_workspace_folders.py <path_to_csv_file>")
         sys.exit(1)
 
     csv_filepath = sys.argv[1]
