@@ -5,7 +5,7 @@ from pdf2image import convert_from_path
 import numpy as np
 
 # Create an OCR reader instance with English as the language and using CUDA
-reader = easyocr.Reader(["en"], gpu=True)
+reader = easyocr.Reader(["nl"], gpu=True)
 
 
 def pdf_to_text(pdf_path, dpi=300):
