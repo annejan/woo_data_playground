@@ -2,6 +2,8 @@
 
 This Python script utilizes `easyocr` to perform Optical Character Recognition (OCR) on PDF files and convert them into text. It's designed to handle multiple PDF files using a glob pattern and supports configurable DPI and language settings.
 
+Read more about [EasyOCR](https://github.com/JaidedAI/EasyOCR) on their GitHub.
+
 ## Requirements
 
 - Python 3.6 or higher
