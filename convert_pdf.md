@@ -13,7 +13,7 @@ It can also be used to quicly make easilly searchable text indices.
 ## Features
 
 - Direct text extraction from PDF using `pdfplumber`.
-- OCR using `pytesseract` and `PIL`.
+- OCR using `pytesseract`.
 - Output generation for both direct extraction and OCR for comparison.
 
 ## Requirements
@@ -21,7 +21,6 @@ It can also be used to quicly make easilly searchable text indices.
 - Python 3.x
 - `pdfplumber`
 - `pytesseract`
-- `Pillow` (PIL Fork)
 
 You may need to install the dependencies if you haven't already:
 
@@ -57,6 +56,18 @@ for pdf in folder/*.pdf; do python convert_pdf.py "$pdf"; done
 ```
 
 This will convert all PDFs in a folder
+
+### DPI Setting
+
+By default, the OCR process uses a resolution of 300 DPI (dots per inch) when converting PDF pages to images. This is a common standard for ensuring that the text is clear enough for the OCR engine to interpret. However, you can adjust the DPI setting based on the quality of your document to potentially improve OCR results.
+
+To specify a custom DPI setting, use the `--dpi` flag followed by the desired resolution:
+
+```bash
+python convert_pdf.py <path_to_pdf> --dpi 600
+```
+
+Increasing the DPI may improve OCR accuracy for documents with small or fine print, but it will also increase processing time and memory usage.
 
 ## Output Details
 
