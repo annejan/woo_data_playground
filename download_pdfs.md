@@ -55,6 +55,10 @@ The script will retrieve JSON data, process it, and download PDFs into folders b
 - For each link-title pair, the script creates a folder and saves the title information in a text file.
 - It also downloads associated PDF files and saves them in the corresponding folders.
 
+### Next steps
+
+You can try to convert the folders and titles into a handy CSV with the [Title CSV Generator](titles_csv.md).
+
 ## License
 
 This package is open-source and released under the [European Union Public License version 1.2](https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12).

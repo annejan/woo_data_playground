@@ -39,7 +39,7 @@ This has to be done on original or local document id basis. Unfortunately not al
 
 The NER scripts are there to see if we can optimise the search engine and since we have the data here anyway I'm using the same playground repository.
 
-## PDF Downloader and Data Extraction Script
+## PDF Downloader and Data Extraction Scripts
 
 **Description:**
 This script retrieves JSON data from [wobcovid19.rijksoverheid.nl](https://wobcovid19.rijksoverheid.nl/), extracts link-title pairs from the data, downloads associated PDF files, creates folders, and saves title information to a CSV file.
@@ -49,6 +49,8 @@ It utilizes the `requests` library for making web requests, `BeautifulSoup` for 
 - Run the script to download PDFs, create folders, and save title information to CSV.
 
 For more information read the [PDF Downloader](download_pdfs.md) documentation.
+
+To get plain text from PDFs in two ways check out [PDF to Text Converter](convert_pdf.md).
 
 ## PDF Table of Contents Extractor
 
