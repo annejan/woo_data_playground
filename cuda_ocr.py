@@ -4,47 +4,53 @@ import argparse
 from pdf2image import convert_from_path
 import numpy as np
 
-# Create an OCR reader instance with English as the language and using CUDA
-reader = easyocr.Reader(["nl"], gpu=True)
+
+def create_arg_parser():
+    """Create and return the ArgumentParser object for command line options."""
+    parser = argparse.ArgumentParser(description="Convert a PDF to text using OCR.")
+    parser.add_argument("pdf_file", help="The PDF file to be converted.")
+    parser.add_argument(
+        "--dpi", type=int, default=600, help="DPI for image conversion, default is 600."
+    )
+    parser.add_argument(
+        "--lang", default="nl", help="Language code(s) for OCR, default is 'nl'."
+    )
+    return parser
 
 
-def pdf_to_text(pdf_path, dpi=300):
-    # Convert PDF to a list of images
+def perform_ocr_on_pdf(pdf_path, dpi=600, language="nl"):
+    """Perform OCR on the given PDF and return the extracted text."""
+    reader = easyocr.Reader([language], gpu=True)
     pages = convert_from_path(pdf_path, dpi=dpi, fmt="jpeg", thread_count=4)
 
-    full_text = ""
+    full_text = []
 
-    # Process each page
-    for page_number, page in enumerate(pages, start=1):
+    for page_number, page_image in enumerate(pages, start=1):
         print(f"Processing page {page_number}...")
+        ocr_results = reader.readtext(np.array(page_image))
+        page_text = " ".join(result[1] for result in ocr_results)
+        full_text.append(page_text)
 
-        # OCR the page
-        results = reader.readtext(np.array(page))
+    return "\n\n".join(full_text)
 
-        # Combine the text from each OCR result
-        page_text = " ".join([res[1] for res in results])
-        full_text += page_text + "\n"
 
-        # Optionally, save each page as an image if needed
-        # page.save(f'page_{page_number}.jpg', 'JPEG')
+def main():
+    arg_parser = create_arg_parser()
+    args = arg_parser.parse_args()
 
-    return full_text
+    pdf_file_path = args.pdf_file
+    dpi_setting = args.dpi
+    ocr_language = args.lang
+
+    extracted_text = perform_ocr_on_pdf(
+        pdf_file_path, dpi=dpi_setting, language=ocr_language
+    )
+
+    text_file_path = pdf_file_path.replace(".pdf", "_ocr.txt")
+    with open(text_file_path, "w", encoding="utf-8") as text_file:
+        text_file.write(extracted_text)
+        print(f"Extracted text written to {text_file_path}")
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Convert a PDF to text using OCR.")
-    parser.add_argument("pdf_file", help="The PDF file to be converted.")
-    parser.add_argument("--dpi", type=int, default=300, help="The DPI for image conversion. Default is 600.")
-    args = parser.parse_args()
-
-    pdf_file_path = args.pdf_file
-    dpi_value = args.dpi
-
-    # Convert the PDF to text using the specified DPI
-    extracted_text = pdf_to_text(pdf_file_path, dpi=dpi_value)
-
-    # Write the extracted text to a txt file
-    txt_file_path = pdf_file_path.replace('.pdf', '_ocr.txt')
-    with open(txt_file_path, 'w', encoding='utf-8') as txt_file:
-        txt_file.write(extracted_text)
-        print(f"Extracted text written to {txt_file_path}")
+    main()
