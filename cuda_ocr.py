@@ -2,8 +2,6 @@ import easyocr
 import sys
 import argparse
 import fitz
-import numpy as np
-from PIL import Image
 
 
 def create_arg_parser():
@@ -21,7 +19,7 @@ def create_arg_parser():
 
 def perform_ocr_on_page(page_image, reader):
     """Perform OCR on a single page image."""
-    ocr_results = reader.readtext(np.array(page_image))
+    ocr_results = reader.readtext(page_image)
     page_text = " ".join(result[1] for result in ocr_results)
     return page_text
 
@@ -33,10 +31,9 @@ def process_pdf(pdf_path, reader, dpi):
     n = 0
     for page in doc:
         n = n + 1
-        print(f"Processing page {n}...")
+        print(f"Processing page {n:04}")
         pix = page.get_pixmap(matrix=fitz.Matrix(dpi / 72, dpi / 72))
-        img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
-        page_text = perform_ocr_on_page(img, reader)
+        page_text = perform_ocr_on_page(pix.tobytes("png"), reader)
         full_text.append(page_text)
 
     return "\n\n".join(full_text)
