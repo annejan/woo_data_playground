@@ -19,15 +19,15 @@ pip install easyocr pdf2image numpy
 
 ## Usage
 
-Run the script from the command line, providing the glob pattern for the PDF files you want to convert, and optional arguments for DPI and language:
+Run the script from the command line, providing the path of one or more PDF files you want to convert, and optional arguments for DPI and language:
 
 ```bash
-python pdf_ocr_script.py 'path/to/pdf/files/*.pdf' --dpi 600 --lang 'nl'
+python pdf_ocr_script.py path/to/pdf/files/*.pdf --dpi 600 --lang 'nl'
 ```
 
 ### Arguments
 
-- `pdf_glob`: The glob pattern for the PDF files to convert (e.g., `'./pdfs/*.pdf'`).
+- `pdf_files`: The one or more PDF files to convert (e.g., `document_1.pdf document_2.pdf`).
 - `--dpi` (optional): The resolution used for converting PDF pages to images before OCR. Default is `600`.
 - `--lang` (optional): The language code used by OCR. Default is Dutch (`'nl'`), but you can set it to any supported language like English (`'en'`).
 

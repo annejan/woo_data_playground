@@ -1,7 +1,6 @@
 import easyocr
 import sys
 import argparse
-import glob
 from pdf2image import convert_from_path
 import numpy as np
 
@@ -10,7 +9,7 @@ def create_arg_parser():
     """Create and return the ArgumentParser object for command line options."""
     parser = argparse.ArgumentParser(description="Convert PDF files to text using OCR.")
     parser.add_argument(
-        "pdf_glob", help="The glob pattern for PDF files to be converted."
+        "pdf_files", nargs='+', help="PDF file(s) to be converted."
     )
     parser.add_argument(
         "--dpi", type=int, default=600, help="DPI for image conversion, default is 600."
@@ -49,7 +48,7 @@ def main():
     # Initialize the OCR reader instance outside of the loop
     reader = easyocr.Reader([args.lang], gpu=True)
 
-    for pdf_file_path in glob.glob(args.pdf_glob):
+    for pdf_file_path in args.pdf_files:
         print(f"Starting OCR for {pdf_file_path}")
         extracted_text = process_pdf(pdf_file_path, reader, args.dpi)
 
