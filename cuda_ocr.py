@@ -1,16 +1,15 @@
 import easyocr
 import sys
 import argparse
-from pdf2image import convert_from_path
+import fitz
 import numpy as np
+from PIL import Image
 
 
 def create_arg_parser():
     """Create and return the ArgumentParser object for command line options."""
     parser = argparse.ArgumentParser(description="Convert PDF files to text using OCR.")
-    parser.add_argument(
-        "pdf_files", nargs='+', help="PDF file(s) to be converted."
-    )
+    parser.add_argument("pdf_files", nargs="+", help="PDF file(s) to be converted.")
     parser.add_argument(
         "--dpi", type=int, default=600, help="DPI for image conversion, default is 600."
     )
@@ -29,12 +28,15 @@ def perform_ocr_on_page(page_image, reader):
 
 def process_pdf(pdf_path, reader, dpi):
     """Process a single PDF file, performing OCR on each page."""
-    pages = convert_from_path(pdf_path, dpi=dpi, fmt="jpeg", thread_count=4)
+    doc = fitz.open(pdf_path)
     full_text = []
-
-    for page_number, page_image in enumerate(pages, start=1):
-        print(f"Processing page {page_number}...")
-        page_text = perform_ocr_on_page(page_image, reader)
+    n = 0
+    for page in doc:
+        n = n + 1
+        print(f"Processing page {n}...")
+        pix = page.get_pixmap(matrix=fitz.Matrix(dpi / 72, dpi / 72))
+        img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
+        page_text = perform_ocr_on_page(img, reader)
         full_text.append(page_text)
 
     return "\n\n".join(full_text)

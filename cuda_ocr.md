@@ -8,7 +8,7 @@ Read more about [EasyOCR](https://github.com/JaidedAI/EasyOCR) on their GitHub.
 
 - Python 3.6 or higher
 - easyocr
-- pdf2image
+- fitz PyMuPDF
 - numpy
 
 Install the required packages using pip:
