@@ -84,6 +84,43 @@ def is_meaningful_content(s: str, threshold: float = 0.2) -> bool:
     return proportion_meaningful >= threshold
 
 
+def chunk_text(text: str, max_length: int = 1337) -> list:
+    """
+    Splits the text into chunks that are at most max_length characters long,
+    without splitting words if possible.
+
+    Args:
+        text (str): The text to be chunked.
+        max_length (int): The maximum length of each chunk.
+
+    Returns:
+        list: A list of text chunks.
+    """
+    words = text.split()
+    chunks = []
+    current_chunk = []
+
+    for word in words:
+        # Check if adding the next word would exceed the max_length
+        if (
+            sum(len(w) for w in current_chunk) + len(word) + len(current_chunk)
+            > max_length
+        ):
+            # If the current_chunk is not empty, join it and add to chunks
+            if current_chunk:
+                chunks.append(" ".join(current_chunk))
+                current_chunk = []
+
+        # Add the current word to the chunk
+        current_chunk.append(word)
+
+    # Add the last chunk if it's not empty
+    if current_chunk:
+        chunks.append(" ".join(current_chunk))
+
+    return chunks
+
+
 def process_entities(
     sentence: Sentence, tagger: SequenceTagger, certainty: float, verbose: bool
 ) -> Dict[str, Dict[str, Union[str, int]]]:
@@ -164,65 +201,34 @@ def get_entities_from_pdf(
 
 
 def get_entities_from_text(
-    text: str,
-    tagger: SequenceTagger,
-    certainty: float,
-    verbose: bool,
-    max_length: int = 1337,
+    text: str, tagger: SequenceTagger, certainty: float, verbose: bool
 ) -> Dict[str, Dict[str, Union[str, int]]]:
     """
-    Extracts named entities from text, splitting text into smaller segments if necessary.
-
-    This function splits the input text into smaller parts if it exceeds `max_length`
-    to ensure that the tagger processes manageable segments without losing word integrity.
-    Each segment is processed separately to extract entities, taking care not to split
-    words across segments.
+    Extracts entities from a plain text string using the specified tagger.
+    Processes the text in chunks to avoid breaking words.
 
     Args:
-        text (str): Text to extract entities from.
-        tagger (SequenceTagger): Flair NER tagger instance.
-        certainty (float): Threshold for entity certainty.
-        verbose (bool): Enables verbose output.
-        max_length (int): Maximum segment length to process at once.
+        text (str): The text string to process.
+        tagger (SequenceTagger): The SequenceTagger instance to use for entity recognition.
+        certainty (float): The threshold to filter entities by their recognition certainty.
+        verbose (bool): Flag for verbose output during entity recognition.
 
     Returns:
-        dict: A dictionary where keys are entity types and values are dictionaries
-        containing the entities and their positions in the original text.
+        dict: A dictionary where keys are entity types and values are dictionaries of extracted entities and positions.
     """
     if not text.strip() or not is_meaningful_content(text):
         return {}
-
-    segments = []
-    while text:
-        if len(text) <= max_length:
-            segments.append(text)
-            break
-        else:
-            split_pos = text.rfind(" ", 0, max_length) + 1
-            if (
-                split_pos <= 0
-            ):  # If no space is found, force split to avoid infinite loop
-                split_pos = max_length
-            segments.append(text[:split_pos])
-            text = text[split_pos:]
-
-    entities = {}
-    offset = 0
-    for segment in segments:
-        segment_entities = process_entities(
-            Sentence(segment), tagger, certainty, verbose
-        )
-        for entity_type, entity_info in segment_entities.items():
-            for entity in entity_info:
-                entity["start_pos"] += offset
-                entity["end_pos"] += offset
-            if entity_type in entities:
-                entities[entity_type].extend(entity_info)
+    entities_result = {}
+    chunks = chunk_text(text)
+    for chunk in chunks:
+        sentence = Sentence(chunk)
+        chunk_entities = process_entities(sentence, tagger, certainty, verbose)
+        for entity_type, entity_info in chunk_entities.items():
+            if entity_type not in entities_result:
+                entities_result[entity_type] = entity_info
             else:
-                entities[entity_type] = entity_info
-        offset += len(segment)
-
-    return entities
+                entities_result[entity_type]["count"] += entity_info["count"]
+    return entities_result
 
 
 def write_to_excel(
