@@ -52,46 +52,55 @@ def create_arg_parser():
     parser.add_argument(
         "--lang", default="nl", help="Language code for OCR, default is 'nl'."
     )
+    parser.add_argument(
+        "--batch",
+        type=int,
+        default=1,
+        help="Batch size for OCR processing within an image, default is 1.",
+    )
     return parser
 
 
-def perform_ocr_on_page(page_image, reader):
-    """Perform OCR on a single page image."""
-    ocr_results = reader.readtext(page_image, detail=0, paragraph=True, batch_size=8)
+def perform_ocr_on_page(page_image, reader, batch_size):
+    """Perform OCR on a single page image using the given batch size."""
+    ocr_results = reader.readtext(
+        page_image, detail=0, paragraph=True, batch_size=batch_size
+    )
     page_text = "\n".join(ocr_results)
     return page_text
 
 
-def process_pdf(pdf_path, reader, dpi):
+def process_pdf(pdf_path, reader, dpi, batch_size):
     """Process a single PDF file, performing OCR on each page."""
     doc = fitz.open(pdf_path)
     full_text = []
+
     for page_num, page in enumerate(doc, start=1):
         print(f"Processing page {page_num:04}")
         scale = dpi / 72
         matrix = fitz.Matrix(scale, scale)
         pix = page.get_pixmap(matrix=matrix)
         try:
-            page_text = perform_ocr_on_page(pix.tobytes("png"), reader)
+            page_image = pix.tobytes("png")
+            page_text = perform_ocr_on_page(page_image, reader, batch_size)
             full_text.append(page_text)
         except Exception as e:
             print(f"An error occurred while processing page {page_num:04}: {e}")
         finally:
             pix = None  # Free pixmap memory immediately
+
     return "\n\n".join(full_text)
 
 
 def main():
-    """Process PDFs and handle config"""
     arg_parser = create_arg_parser()
     args = arg_parser.parse_args()
 
-    # Initialize the OCR reader instance outside of the loop
     reader = easyocr.Reader([args.lang], gpu=True)
 
     for pdf_file_path in args.pdf_files:
         print(f"Starting OCR for {pdf_file_path}")
-        extracted_text = process_pdf(pdf_file_path, reader, args.dpi)
+        extracted_text = process_pdf(pdf_file_path, reader, args.dpi, args.batch)
 
         text_file_path = pdf_file_path.replace(".pdf", "_ocr.txt")
         with open(text_file_path, "w", encoding="utf-8") as text_file:
