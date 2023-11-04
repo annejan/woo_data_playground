@@ -19,8 +19,8 @@ def create_arg_parser():
 
 def perform_ocr_on_page(page_image, reader):
     """Perform OCR on a single page image."""
-    ocr_results = reader.readtext(page_image)
-    page_text = " ".join(result[1] for result in ocr_results)
+    ocr_results = reader.readtext(page_image, detail = 0)
+    page_text = " ".join(ocr_results)
     return page_text
 
 
