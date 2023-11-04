@@ -57,7 +57,7 @@ def create_arg_parser():
 
 def perform_ocr_on_page(page_image, reader):
     """Perform OCR on a single page image."""
-    ocr_results = reader.readtext(page_image, detail = 0, paragraph=True, batch_size = 8)
+    ocr_results = reader.readtext(page_image, detail=0, paragraph=True, batch_size=8)
     page_text = "\n".join(ocr_results)
     return page_text
 
@@ -79,6 +79,7 @@ def process_pdf(pdf_path, reader, dpi):
         finally:
             pix = None  # Free pixmap memory immediately
     return "\n\n".join(full_text)
+
 
 def main():
     """Process PDFs and handle config"""
