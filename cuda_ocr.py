@@ -29,6 +29,7 @@ def process_pdf(pdf_path, reader, dpi):
     doc = fitz.open(pdf_path)
     full_text = []
     n = 0
+    print(f"Pages {len(doc)}")
     for page in doc:
         n = n + 1
         print(f"Processing page {n:04}")
