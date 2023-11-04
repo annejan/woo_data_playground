@@ -81,7 +81,7 @@ def process_pdf(pdf_path, reader, dpi, batch_size):
     """Process a single PDF file, performing OCR on each page."""
     doc = fitz.open(pdf_path)
     full_text = []
-
+    print(f"Pages {len(doc)}")
     for page_num, page in enumerate(doc, start=1):
         print(f"Processing page {page_num:04}")
         scale = dpi / 72
