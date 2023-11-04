@@ -36,10 +36,11 @@ For contributions, bug reports, or suggestions, please visit the project reposit
 
 SPDX-License-Identifier: EUPL-1.2
 """
-import easyocr
+import os
 import sys
 import argparse
 import fitz
+import easyocr
 
 
 def create_arg_parser():
@@ -57,6 +58,12 @@ def create_arg_parser():
         type=int,
         default=1,
         help="Batch size for OCR processing within an image, default is 1.",
+    )
+    parser.add_argument(
+        "-f",
+        "--force",
+        action="store_true",
+        help="Force the action to run even if the file exists",
     )
     return parser
 
@@ -95,17 +102,15 @@ def process_pdf(pdf_path, reader, dpi, batch_size):
 def main():
     arg_parser = create_arg_parser()
     args = arg_parser.parse_args()
-
     reader = easyocr.Reader([args.lang], gpu=True)
-
     for pdf_file_path in args.pdf_files:
-        print(f"Starting OCR for {pdf_file_path}")
-        extracted_text = process_pdf(pdf_file_path, reader, args.dpi, args.batch)
-
         text_file_path = pdf_file_path.replace(".pdf", "_ocr.txt")
-        with open(text_file_path, "w", encoding="utf-8") as text_file:
-            text_file.write(extracted_text)
-            print(f"Extracted text written to {text_file_path}")
+        if args.force or not os.path.exists(text_file_path):
+            print(f"Starting OCR for {pdf_file_path}")
+            extracted_text = process_pdf(pdf_file_path, reader, args.dpi, args.batch)
+            with open(text_file_path, "w", encoding="utf-8") as text_file:
+                text_file.write(extracted_text)
+                print(f"Extracted text written to {text_file_path}")
 
 
 if __name__ == "__main__":
