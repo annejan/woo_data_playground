@@ -6,6 +6,8 @@ Read more about [EasyOCR](https://github.com/JaidedAI/EasyOCR) on their GitHub.
 
 Read more about [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR/blob/release/2.7/README_en.md) on their GitHub.
 
+Unfortunately PaddleOCR seems to only work on CUDA 11 and requires older versions of numpy and PyMuPDF.
+
 ## Requirements
 
 - Python 3.6 or higher

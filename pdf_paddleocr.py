@@ -2,7 +2,7 @@
 PDF to Text OCR Converter
 
 This module provides a command-line interface for converting PDF files to text using OCR (Optical Character Recognition).
-It leverages the PaqddleOCR library for OCR tasks and PyMuPDF for efficient extraction of images from PDF pages. The script
+It leverages the PaddleOCR library for OCR tasks and PyMuPDF for efficient extraction of images from PDF pages. The script
 processes each page of the given PDF file(s), performs OCR, and saves the extracted text into corresponding text files.
 
 Requirements:
@@ -70,7 +70,7 @@ def create_arg_parser():
 def perform_ocr_on_page(page_image, reader):
     """Perform OCR on a single page image using the given batch size."""
     ocr_results = reader.ocr(page_image, cls=True)
-    page_text = "\n".join([line[1][0] for line in ocr_results[0]])
+    page_text = "\n".join([result[1][0] for result in ocr_results])
     return page_text
 
 
