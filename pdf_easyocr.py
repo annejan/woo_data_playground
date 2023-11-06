@@ -37,7 +37,6 @@ For contributions, bug reports, or suggestions, please visit the project reposit
 SPDX-License-Identifier: EUPL-1.2
 """
 import os
-import sys
 import argparse
 import fitz
 import easyocr
@@ -64,6 +63,12 @@ def create_arg_parser():
         "--force",
         action="store_true",
         help="Force the action to run even if the file exists",
+    )
+    parser.add_argument(
+        "--no-gpu",
+        action="store_false",
+        dest="gpu",
+        help="Do not use GPU for OCR, default is to use GPU.",
     )
     return parser
 
@@ -102,8 +107,8 @@ def process_pdf(pdf_path, reader, dpi, batch_size):
 def main():
     arg_parser = create_arg_parser()
     args = arg_parser.parse_args()
-    lang = args.lang.split(',')
-    reader = easyocr.Reader(lang, gpu=True)
+    lang = args.lang.split(",")
+    reader = easyocr.Reader(lang, gpu=args.gpu)
     for pdf_file_path in args.pdf_files:
         text_file_path = pdf_file_path.replace(".pdf", "_ocr.txt")
         if args.force or not os.path.exists(text_file_path):
