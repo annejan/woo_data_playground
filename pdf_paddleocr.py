@@ -2,11 +2,11 @@
 PDF to Text OCR Converter
 
 This module provides a command-line interface for converting PDF files to text using OCR (Optical Character Recognition).
-It leverages the EasyOCR library for OCR tasks and PyMuPDF for efficient extraction of images from PDF pages. The script
+It leverages the PaqddleOCR library for OCR tasks and PyMuPDF for efficient extraction of images from PDF pages. The script
 processes each page of the given PDF file(s), performs OCR, and saves the extracted text into corresponding text files.
 
 Requirements:
-- easyocr: For OCR operations.
+- PaddleOCR: For OCR operations.
 - PyMuPDF (fitz): For handling PDF and image data.
 
 Usage:
@@ -40,7 +40,7 @@ import os
 import sys
 import argparse
 import fitz
-import easyocr
+from paddleocr import PaddleOCR
 
 
 def create_arg_parser():
@@ -54,12 +54,6 @@ def create_arg_parser():
         "--lang", default="nl", help="Language code for OCR, default is 'nl'."
     )
     parser.add_argument(
-        "--batch",
-        type=int,
-        default=1,
-        help="Batch size for OCR processing within an image, default is 1.",
-    )
-    parser.add_argument(
         "-f",
         "--force",
         action="store_true",
@@ -70,10 +64,8 @@ def create_arg_parser():
 
 def perform_ocr_on_page(page_image, reader, batch_size):
     """Perform OCR on a single page image using the given batch size."""
-    ocr_results = reader.readtext(
-        page_image, detail=0, paragraph=True, batch_size=batch_size
-    )
-    page_text = "\n".join(ocr_results)
+    ocr_results = reader.ocr(page_image, cls=True)
+    page_text = "\n".join([line[1][0] for line in ocr_results[0]])
     return page_text
 
 
@@ -102,7 +94,7 @@ def process_pdf(pdf_path, reader, dpi, batch_size):
 def main():
     arg_parser = create_arg_parser()
     args = arg_parser.parse_args()
-    reader = easyocr.Reader([args.lang], gpu=True)
+    reader = PaddleOCR(use_angle_cls=True, lang=args.lang)  
     for pdf_file_path in args.pdf_files:
         text_file_path = pdf_file_path.replace(".pdf", "_ocr.txt")
         if args.force or not os.path.exists(text_file_path):

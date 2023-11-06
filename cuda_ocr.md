@@ -1,20 +1,28 @@
 # CUDA OCR PDF Processing
 
-This Python script utilizes `easyocr` to perform Optical Character Recognition (OCR) on PDF files and convert them into text. It's designed to handle multiple PDF files using a glob pattern and supports configurable DPI and language settings.
+This Python script utilizes `easyocr` or `paddleocr` to perform Optical Character Recognition (OCR) on PDF files and convert them into text. It's designed to handle multiple PDF files using a glob pattern and supports configurable DPI and language settings.
 
 Read more about [EasyOCR](https://github.com/JaidedAI/EasyOCR) on their GitHub.
+
+Read more about [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR/blob/release/2.7/README_en.md) on their GitHub.
 
 ## Requirements
 
 - Python 3.6 or higher
 - easyocr
+- paddleocr
 - fitz PyMuPDF
-- numpy
 
 Install the required packages using pip:
 
 ```bash
-pip install easyocr pdf2image numpy
+pip install easyocr PyMuPDF
+```
+
+or 
+
+```bash
+pip install paddlepaddle-gpu paddleocr PyMuPDF
 ```
 
 ## Usage
@@ -22,7 +30,7 @@ pip install easyocr pdf2image numpy
 Run the script from the command line, providing the path of one or more PDF files you want to convert, and optional arguments for DPI and language:
 
 ```bash
-python pdf_ocr_script.py path/to/pdf/files/*.pdf --dpi 600 --lang 'nl'
+python pdf_ocr.py path/to/pdf/files/*.pdf --dpi 600 --lang nl
 ```
 
 ### Arguments
