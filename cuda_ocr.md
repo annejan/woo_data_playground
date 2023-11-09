@@ -8,6 +8,8 @@ Read more about [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR/blob/relea
 
 Unfortunately PaddleOCR seems to only work on CUDA 11 and requires older versions of numpy and PyMuPDF.
 
+There are courrently two implementations: [pdf_easyocr.py](pdf_easyocr.py) and [pdf_paddleocr.py](pdf_paddleocr.py).
+
 ## Requirements
 
 - Python 3.6 or higher
@@ -39,6 +41,7 @@ python pdf_ocr.py path/to/pdf/files/*.pdf --dpi 600 --lang nl
 
 - `pdf_files`: The one or more PDF files to convert (e.g., `document_1.pdf document_2.pdf`).
 - `--dpi` (optional): The resolution used for converting PDF pages to images before OCR. Default is `600`.
+- `--no-gpu` (optional): Don't use GPU (or GPU not available).
 - `--lang` (optional): The language code used by OCR. Default is Dutch (`'nl'`), but you can set it to any supported language like English (`'en'`).
 
 ### Output
