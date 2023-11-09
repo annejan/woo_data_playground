@@ -13,7 +13,7 @@ The script reads the Excel file, processes the PDF, and outputs each segment as 
 The last segment will run until the end of the PDF if there are no more entries in the Excel file to define another starting page.
 
 Usage:
-    python script.py [excel_file] [pdf_file]
+    python pdf_cutter.py [excel_file] [pdf_file]
 
 Where:
     [excel_file] is the path to the Excel file containing the mappings.
@@ -62,6 +62,12 @@ def save_pages(pdf_writer, document_id):
 
 def extract_and_save_pages(input_pdf, mappings):
     """Extract pages based on mappings and save to new PDF files."""
+    if mappings.iloc[0]["Page"] != 1:
+        preface_pdf = pikepdf.new()
+        preface_pdf.pages.extend(input_pdf.pages[0 : mappings.iloc[0]["Page"] - 1])
+        preface_pdf.save("preface.pdf", linearize=True)
+        print("Created preface.pdf")
+
     for index, row in mappings.iterrows():
         start_page = row["Page"]
         end_page = (
