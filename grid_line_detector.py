@@ -66,11 +66,13 @@ def refine_lines(lines, min_distance=10):
     return refined
 
 
-def find_grid_lines_on_image(image, cutoff_fraction=0.6, min_distance=10):
+def find_grid_lines_on_image(
+    image, cutoff_fraction=0.6, min_distance=10, max_columns=None, max_rows=None
+):
     """
-    Detects and refines grid line positions in both vertical and horizontal directions.
+    Detects and refines grid line positions in both vertical and horizontal directions
+    based on a specified maximum number of columns (max_columns) and rows (max_rows) to keep.
     """
-    # gray_image = cv2.cvtColor(np.array(image), cv2.COLOR_BGR2GRAY)
     edges = cv2.Canny(np.array(image), 50, 150)
 
     vertical_line_likelihood = estimate_line_likelihood(edges, axis="x")
@@ -79,7 +81,23 @@ def find_grid_lines_on_image(image, cutoff_fraction=0.6, min_distance=10):
     vertical_cutoff = np.max(vertical_line_likelihood) * cutoff_fraction
     horizontal_cutoff = np.max(horizontal_line_likelihood) * cutoff_fraction
 
-    vertical_lines = refine_lines(
+    # Select lines based on likelihood scores and apply the likelihood cutoff
+    vertical_lines = [
+        x
+        for x, likelihood in enumerate(vertical_line_likelihood)
+        if likelihood >= vertical_cutoff
+    ]
+    horizontal_lines = [
+        y
+        for y, likelihood in enumerate(horizontal_line_likelihood)
+        if likelihood >= horizontal_cutoff
+    ]
+
+    # Sort the selected lines based on likelihood scores in descending order
+    vertical_lines.sort(key=lambda x: vertical_line_likelihood[x], reverse=True)
+    horizontal_lines.sort(key=lambda x: horizontal_line_likelihood[x], reverse=True)
+
+    vertical_refined = refine_lines(
         [
             x
             for x, likelihood in enumerate(vertical_line_likelihood)
@@ -87,7 +105,7 @@ def find_grid_lines_on_image(image, cutoff_fraction=0.6, min_distance=10):
         ],
         min_distance,
     )
-    horizontal_lines = refine_lines(
+    horizontal_refined = refine_lines(
         [
             y
             for y, likelihood in enumerate(horizontal_line_likelihood)
@@ -95,5 +113,11 @@ def find_grid_lines_on_image(image, cutoff_fraction=0.6, min_distance=10):
         ],
         min_distance,
     )
+
+    # Take the top max_columns and max_rows lines if specified
+    if max_columns is not None:
+        vertical_lines = vertical_refined[:max_columns]
+    if max_rows is not None:
+        horizontal_lines = horizontal_refined[:max_rows]
 
     return vertical_lines, horizontal_lines

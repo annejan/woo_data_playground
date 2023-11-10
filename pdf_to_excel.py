@@ -55,6 +55,8 @@ class OCRConfig:
         no_ocr=False,
         cutoff_fraction=0.6,
         min_distance=10,
+        columns=None,
+        rows=None,
     ):
         self.start_page = start_page
         self.dpi = dpi
@@ -63,6 +65,8 @@ class OCRConfig:
         self.no_ocr = no_ocr
         self.cutoff_fraction = cutoff_fraction
         self.min_distance = min_distance
+        self.columns = columns
+        self.rows = rows
 
 
 def convert_pdf_to_images(pdf_path, start_page=1, dpi=300):
@@ -97,13 +101,16 @@ def process_pdf_and_ocr_to_excel(pdf_path, output_excel_path, config):
         pdf_path, start_page=config.start_page, dpi=config.dpi
     )
     all_page_data = []
-
     for img in images:
         page_data = []
         if config.verbose:
             print("Getting cell information")
         vertical_lines, horizontal_lines = find_grid_lines_on_image(
-            img, config.cutoff_fraction, config.min_distance
+            img,
+            config.cutoff_fraction,
+            config.min_distance,
+            config.columns,
+            config.rows,
         )
 
         if config.debug:
@@ -205,6 +212,20 @@ def main():
         default=10,
         help="Minimum distance between grid lines in pixels. Defaults to 10.",
     )
+    parser.add_argument(
+        "--columns",
+        "-c",
+        type=int,
+        default=None,
+        help="Amount of columns (0 indexed).",
+    )
+    parser.add_argument(
+        "--rows",
+        "-r",
+        type=int,
+        default=None,
+        help="Amount of rows (0 indexed)",
+    )
 
     args = parser.parse_args()
 
@@ -216,6 +237,8 @@ def main():
         no_ocr=args.no_ocr,
         cutoff_fraction=args.cutoff_fraction,
         min_distance=args.min_distance,
+        columns=args.columns,
+        rows=args.rows,
     )
 
     process_pdf_and_ocr_to_excel(args.pdf_path, args.output_excel_path, config)
