@@ -17,13 +17,7 @@ Usage:
     python pdf_to_excel.py <pdf_path> <output_excel_path> [options]
 
 Options:
-- --start_page: Specify the starting page for processing. Default is 1.
-- --dpi: Set the DPI for converting PDF to images. Default is 300.
-- --verbose: Enable verbose mode for detailed status output.
-- --debug: Enable debug mode to output images with detected cells.
-- --no-ocr: Disable OCR for faster processing in debug mode.
-- --cutoff: Set the cutoff fraction for grid line detection. Default is 0.6.
-- --min-distance: Set the minimum distance between grid lines in pixels. Default is 10.
+TODO TOO FAST
 
 Example:
     python pdf_to_excel.py sample.pdf output.xlsx --verbose --debug
@@ -51,6 +45,26 @@ import pandas as pd
 from grid_line_detector import find_grid_lines_on_image
 
 
+class OCRConfig:
+    def __init__(
+        self,
+        start_page=1,
+        dpi=300,
+        verbose=False,
+        debug=False,
+        no_ocr=False,
+        cutoff_fraction=0.6,
+        min_distance=10,
+    ):
+        self.start_page = start_page
+        self.dpi = dpi
+        self.verbose = verbose
+        self.debug = debug
+        self.no_ocr = no_ocr
+        self.cutoff_fraction = cutoff_fraction
+        self.min_distance = min_distance
+
+
 def convert_pdf_to_images(pdf_path, start_page=1, dpi=300):
     """
     Convert a PDF file to a list of images, one for each page.
@@ -75,38 +89,30 @@ def draw_cells_on_image(image, vertical_lines, horizontal_lines):
             cv2.rectangle(image, (x1, y1), (x2, y2), (0, 255, 0), 2)
 
 
-def process_pdf_and_ocr_to_excel(
-    pdf_path,
-    output_excel_path,
-    start_page=1,
-    dpi=300,
-    verbose=False,
-    debug=False,
-    no_ocr=False,
-    cutoff_fraction=0.6,
-    min_distance=10,
-):
-
-    if verbose:
+def process_pdf_and_ocr_to_excel(pdf_path, output_excel_path, config):
+    # Use config properties instead of individual arguments
+    if config.verbose:
         print("Getting PDF images")
-    images = convert_pdf_to_images(pdf_path, start_page=start_page, dpi=dpi)
+    images = convert_pdf_to_images(
+        pdf_path, start_page=config.start_page, dpi=config.dpi
+    )
     all_page_data = []
 
     for img in images:
         page_data = []
-        if verbose:
+        if config.verbose:
             print("Getting cell information")
         vertical_lines, horizontal_lines = find_grid_lines_on_image(
-            img, cutoff_fraction, min_distance
+            img, config.cutoff_fraction, config.min_distance
         )
 
-        if debug:
+        if config.debug:
             debug_image = np.array(img)  # Create a copy for debug drawing
 
         for i in range(len(horizontal_lines) - 1):
             row_data = []
             for j in range(len(vertical_lines) - 1):
-                if not no_ocr:
+                if not config.no_ocr:
                     cell_image = img.crop(
                         (
                             vertical_lines[j],
@@ -115,20 +121,20 @@ def process_pdf_and_ocr_to_excel(
                             horizontal_lines[i + 1],
                         )
                     )
-                    if verbose:
+                    if config.verbose:
                         print("Getting cell data")
-                        if debug:
+                        if config.debug:
                             cell_image.save(
-                                f"debug_cell_{images.index(img) + start_page}_{i}_{j}.png",
+                                f"debug_cell_{images.index(img) + config.start_page}_{i}_{j}.png",
                             )
                     cell_text = ocr_cell(cell_image)
-                    if verbose:
+                    if config.verbose:
                         print(
-                            f"Page {images.index(img) + start_page} Cell {i}:{j} found text: {cell_text}"
+                            f"Page {images.index(img) + config.start_page} Cell {i}:{j} found text: {cell_text}"
                         )
                     row_data.append(cell_text)
 
-                if debug:
+                if config.debug:
                     draw_cells_on_image(
                         debug_image,
                         [vertical_lines[j], vertical_lines[j + 1]],
@@ -139,9 +145,9 @@ def process_pdf_and_ocr_to_excel(
 
         all_page_data.extend(page_data)
 
-        if debug:
+        if config.debug:
             cv2.imwrite(
-                f"debug_page_{images.index(img) + start_page}.png",
+                f"debug_page_{images.index(img) + config.start_page}.png",
                 cv2.cvtColor(debug_image, cv2.COLOR_RGB2BGR),
             )
 
@@ -202,9 +208,7 @@ def main():
 
     args = parser.parse_args()
 
-    process_pdf_and_ocr_to_excel(
-        args.pdf_path,
-        args.output_excel_path,
+    config = OCRConfig(
         start_page=args.start_page,
         dpi=args.dpi,
         verbose=args.verbose,
@@ -213,6 +217,8 @@ def main():
         cutoff_fraction=args.cutoff_fraction,
         min_distance=args.min_distance,
     )
+
+    process_pdf_and_ocr_to_excel(args.pdf_path, args.output_excel_path, config)
 
 
 if __name__ == "__main__":
