@@ -73,7 +73,8 @@ def find_grid_lines_on_image(
     Detects and refines grid line positions in both vertical and horizontal directions
     based on a specified maximum number of columns (max_columns) and rows (max_rows) to keep.
     """
-    edges = cv2.Canny(np.array(image), 50, 150)
+    image_array = np.array(image)
+    edges = cv2.Canny(image_array, 50, 150)
 
     vertical_line_likelihood = estimate_line_likelihood(edges, axis="x")
     horizontal_line_likelihood = estimate_line_likelihood(edges, axis="y")

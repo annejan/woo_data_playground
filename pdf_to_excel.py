@@ -57,6 +57,7 @@ class OCRConfig:
         min_distance=10,
         columns=None,
         rows=None,
+        zoom=None,
     ):
         self.start_page = start_page
         self.dpi = dpi
@@ -67,6 +68,7 @@ class OCRConfig:
         self.min_distance = min_distance
         self.columns = columns
         self.rows = rows
+        self.zoom = zoom
 
 
 def convert_pdf_to_images(pdf_path, start_page=1, dpi=300):
@@ -105,13 +107,27 @@ def process_pdf_and_ocr_to_excel(pdf_path, output_excel_path, config):
         page_data = []
         if config.verbose:
             print("Getting cell information")
+
+        if config.zoom:
+            grid_img = cv2.resize(
+                np.array(img),
+                (int(img.width * config.zoom), int(img.height * config.zoom)),
+            )
+        else:
+            grid_img = img
+
         vertical_lines, horizontal_lines = find_grid_lines_on_image(
-            img,
+            grid_img,
             config.cutoff_fraction,
             config.min_distance,
             config.columns,
             config.rows,
         )
+
+        if config.zoom:
+            inverse_zoom = 1.0 / config.zoom
+            vertical_lines = [int(line * inverse_zoom) for line in vertical_lines]
+            horizontal_lines = [int(line * inverse_zoom) for line in horizontal_lines]
 
         if config.debug:
             debug_image = np.array(img)  # Create a copy for debug drawing
@@ -226,8 +242,19 @@ def main():
         default=None,
         help="Amount of rows (0 indexed)",
     )
+    parser.add_argument(
+        "--zoom",
+        "-z",
+        type=float,
+        default=None,
+        help="Zoom eg 0.5, should be below zero.",
+    )
 
     args = parser.parse_args()
+
+    if not args.zoom or not 0 < args.zoom <= 1:
+        print("Zoom factor should be between 0 and 1.")
+        exit(1)
 
     config = OCRConfig(
         start_page=args.start_page,
@@ -239,6 +266,7 @@ def main():
         min_distance=args.min_distance,
         columns=args.columns,
         rows=args.rows,
+        zoom=args.zoom,
     )
 
     process_pdf_and_ocr_to_excel(args.pdf_path, args.output_excel_path, config)
