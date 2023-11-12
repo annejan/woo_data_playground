@@ -136,6 +136,13 @@ def process_pdf_and_ocr_to_excel(pdf_path, output_excel_path, config):
             row_data = []
             for j in range(len(vertical_lines) - 1):
                 if not config.no_ocr:
+                    if config.verbose:
+                        print(
+                            vertical_lines[j],
+                            horizontal_lines[i],
+                            vertical_lines[j + 1],
+                            horizontal_lines[i + 1],
+                        )
                     cell_image = img.crop(
                         (
                             vertical_lines[j],
@@ -186,6 +193,7 @@ def main():
     parser.add_argument("output_excel_path", help="Path for the output Excel file.")
     parser.add_argument(
         "--start_page",
+        "-s",
         type=int,
         default=1,
         help="Page to start processing from. Defaults to 1.",
@@ -252,7 +260,7 @@ def main():
 
     args = parser.parse_args()
 
-    if not args.zoom or not 0 < args.zoom <= 1:
+    if args.zoom and not 0 < args.zoom <= 1:
         print("Zoom factor should be between 0 and 1.")
         exit(1)
 

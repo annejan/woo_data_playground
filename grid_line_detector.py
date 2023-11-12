@@ -121,4 +121,7 @@ def find_grid_lines_on_image(
     if max_rows is not None:
         horizontal_lines = horizontal_refined[:max_rows]
 
+    vertical_lines.sort()
+    horizontal_lines.sort()
+
     return vertical_lines, horizontal_lines
