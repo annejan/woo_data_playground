@@ -3,10 +3,16 @@ import sys
 import os
 
 
-def normalize_date(date_series):
-    # Try to convert the dates. If conversion fails, return None
-    return pd.to_datetime(date_series, format="%d-%m-%Y", errors="coerce")
+"""TODO   ' en ' naar ', '"""
+"""TODO   'Whatsapp' naar "chat" """
 
+def normalize_date(date_series, timezone='Europe/Amsterdam'):
+    # Convert the dates to datetime objects
+    date_converted = pd.to_datetime(date_series, format="%d-%m-%Y %H:%M:%S", errors="coerce")
+    # Convert the timezone
+    date_converted = date_converted.dt.tz_localize('UTC').dt.tz_convert(timezone)
+    # Format as ISO 8601 string
+    return date_converted.dt.strftime('%Y-%m-%dT%H:%M:%S')
 
 def normalize_excel(file_path, matter_value):
     # Load the Excel file
