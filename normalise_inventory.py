@@ -14,6 +14,26 @@ def normalize_date(date_series, timezone='Europe/Amsterdam'):
     # Format as ISO 8601 string
     return date_converted.dt.strftime('%Y-%m-%dT%H:%M:%S')
 
+def warn_empty_id(series):
+    # Check for empty or NaN values
+    empty_values = series.isna()
+
+    # Warn if empty values are found
+    if empty_values.any():
+        empty_indices = [index + 2 for index in empty_values[empty_values].index.tolist()]
+        print("Indices of empty fields:", empty_indices)
+
+
+def warn_duplicates(series):
+    # Check for duplicates
+    duplicate_values = series.duplicated(keep=False)
+
+    # Warn if duplicate values are found
+    if duplicate_values.any():
+        duplicated_values_list = [index + 2 for index in series[duplicate_values].index.tolist()]
+        print("Duplicated values:", duplicated_values_list)
+    
+
 def normalize_excel(file_path, matter_value):
     # Load the Excel file
     df = pd.read_excel(file_path)
@@ -52,6 +72,10 @@ def normalize_excel(file_path, matter_value):
     # Normalize the 'Datum' field to datetime, empty if non-convertable
     if "Datum" in df.columns:
         df["Datum"] = normalize_date(df["Datum"])
+
+    if "ID" in df.columns:
+        warn_empty_id(df["ID"])
+        warn_duplicates(df["ID"])
 
     # Save the normalized DataFrame to a new Excel file
     directory, file_name = os.path.split(file_path)
