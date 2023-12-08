@@ -20,6 +20,10 @@ def normalize_id(series):
     series = series.str.replace(r'[^0-9a-zA-Z]', '', regex=True)
     return series.str.replace('nan', '', regex=False)
 
+def normalise_beoordeling(series):
+    return series.str.replace(';', ',', regex=False)
+    return series.str.replace(' en ', ' , ', regex=False)
+
 
 def warn_empty_id(series):
     # Check for empty or NaN values
@@ -86,6 +90,9 @@ def normalize_excel(file_path, matter_value):
         df["ID"] = normalize_id(df["ID"])
         warn_empty_id(df["ID"])
         warn_duplicates(df["ID"])
+
+    if "Beoordelingsgrond" in df.columns:
+        df['Beoordelingsgrond'] = normalise_beoordeling(df['Beoordelingsgrond'])
 
     # Save the normalized DataFrame to a new Excel file
     directory, file_name = os.path.split(file_path)
