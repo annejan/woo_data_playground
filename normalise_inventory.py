@@ -16,7 +16,8 @@ def normalize_date(date_series, timezone='Europe/Amsterdam'):
 
 def normalize_id(series):
     series = series.astype(str)
-    return series.str.replace(r'[^0-9a-zA-Z]', '', regex=True)
+    series = series.str.replace(r'[^0-9a-zA-Z]', '', regex=True)
+    return series.str.replace('nan', '', regex=False)
 
 
 def warn_empty_id(series):
