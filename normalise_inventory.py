@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import sys
 import os
 
@@ -22,7 +23,7 @@ def normalize_id(series):
 
 def warn_empty_id(series):
     # Check for empty or NaN values
-    empty_values = series.isna()
+    empty_values = series.apply(lambda x: x == '' or pd.isna(x))
 
     # Warn if empty values are found
     if empty_values.any():
@@ -32,7 +33,8 @@ def warn_empty_id(series):
 
 def warn_duplicates(series):
     # Check for duplicates
-    duplicate_values = series.duplicated(keep=False)
+    series = series.replace('', np.nan)
+    duplicate_values = series.duplicated(keep=False) & series.notna()
 
     # Warn if duplicate values are found
     if duplicate_values.any():
