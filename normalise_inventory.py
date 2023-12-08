@@ -14,6 +14,11 @@ def normalize_date(date_series, timezone='Europe/Amsterdam'):
     # Format as ISO 8601 string
     return date_converted.dt.strftime('%Y-%m-%dT%H:%M:%S')
 
+def normalize_id(series):
+    series = series.astype(str)
+    return series.str.replace(r'[^0-9a-zA-Z]', '', regex=True)
+
+
 def warn_empty_id(series):
     # Check for empty or NaN values
     empty_values = series.isna()
@@ -73,7 +78,9 @@ def normalize_excel(file_path, matter_value):
     if "Datum" in df.columns:
         df["Datum"] = normalize_date(df["Datum"])
 
+
     if "ID" in df.columns:
+        df["ID"] = normalize_id(df["ID"])
         warn_empty_id(df["ID"])
         warn_duplicates(df["ID"])
 
