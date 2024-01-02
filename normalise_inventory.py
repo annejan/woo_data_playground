@@ -45,6 +45,7 @@ TYPE_REPLACEMENTS = {
 
 
 def replace_types(series):
+    series = series.astype(str)
     for old, new in TYPE_REPLACEMENTS.items():
         pattern = r"^" + re.escape(old) + r"$"
         series = series.str.replace(pattern, new, flags=re.IGNORECASE, regex=True)
