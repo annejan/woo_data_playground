@@ -40,6 +40,7 @@ TYPE_REPLACEMENTS = {
     "powerpoint": "presentation",
     "excel": "spreadsheet",
     "": "unknown",
+    "nan": "unknown",
     "afbeelding": "image",
 }
 
