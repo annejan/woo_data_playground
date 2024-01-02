@@ -73,7 +73,7 @@ def normalize_date(date_series, timezone="Europe/Amsterdam"):
     # Convert the timezone
     date_converted = date_converted.dt.tz_localize("UTC").dt.tz_convert(timezone)
     # Format as ISO 8601 string
-    return date_converted.dt.strftime("%Y-%m-%dT%H:%M:%S")
+    return date_converted.dt.strftime("%Y-%m-%d")
 
 
 def normalize_id(series):
