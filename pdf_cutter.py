@@ -49,6 +49,7 @@ def parse_arguments():
 def load_mappings(excel_path):
     """Load and sort the Excel file with document mappings."""
     df = pd.read_excel(excel_path)
+    df['Page'] = pd.to_numeric(df['Page'], errors='coerce')
     return df.sort_values(by="Page")
 
 
@@ -77,6 +78,12 @@ def extract_and_save_pages(input_pdf, mappings):
         )
 
         output_pdf = pikepdf.new()
+        if pd.isna(start_page):
+            continue
+        start_page = int(start_page)
+        if pd.isna(end_page):
+            end_page = len(input_pdf.pages) + 1
+        end_page = int(end_page)
         output_pdf.pages.extend(input_pdf.pages[start_page - 1 : end_page - 1])
         output_filename = f"{row['DocumentID']}.pdf"
         output_pdf.save(output_filename, linearize=True)
