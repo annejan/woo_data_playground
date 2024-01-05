@@ -67,9 +67,12 @@ def normalize_types(series):
 
 def normalize_date(date_series, timezone="Europe/Amsterdam", threshold=0.8):
     # Convert the dates to datetime objects
-    if date_series.apply(lambda x: isinstance(x, str)).mean() > threshold:
+    if date_series.apply(lambda x: isinstance(x, str)).mean() > (1.0 - threshold):
         date_series = date_series.str.replace("‐", "-", regex=False)  # some people . .
         date_series = date_series.str.replace("\n", " ", regex=False)  # some people . .
+        date_series = date_series.str.replace(
+            " uur", "", regex=False
+        )  # some people . .
     date_converted = pd.to_datetime(
         date_series, format="%d-%m-%Y %H:%M:%S", errors="coerce"
     )
@@ -80,9 +83,7 @@ def normalize_date(date_series, timezone="Europe/Amsterdam", threshold=0.8):
         )
     proportion_nat = date_converted.isna().mean()
     if proportion_nat > threshold:
-        date_converted = pd.to_datetime(
-            date_series, format="%d-%m-%Y", errors="coerce"
-        )
+        date_converted = pd.to_datetime(date_series, format="%d-%m-%Y", errors="coerce")
     proportion_nat = date_converted.isna().mean()
     if proportion_nat > threshold:
         date_converted = pd.to_datetime(
@@ -90,10 +91,10 @@ def normalize_date(date_series, timezone="Europe/Amsterdam", threshold=0.8):
         )
     proportion_nat = date_converted.isna().mean()
     if proportion_nat > threshold:
-        date_converted = pd.to_datetime(
-            date_series, format="%d/%m/%Y", errors="coerce"
-        )
-
+        date_converted = pd.to_datetime(date_series, format="%d/%m/%Y", errors="coerce")
+    proportion_nat = date_converted.isna().mean()
+    if proportion_nat > threshold:
+        return date_series  # Give up!!
     # Convert the timezone
     date_converted = date_converted.dt.tz_localize("UTC").dt.tz_convert(timezone)
     # Format as ISO 8601 string
