@@ -48,7 +48,7 @@ def parse_arguments():
 
 def load_mappings(excel_path):
     """Load and sort the Excel file with document mappings."""
-    df = pd.read_excel(excel_path)
+    df = pd.read_excel(excel_path, dtype={'DocumentID': str})
     df['Page'] = pd.to_numeric(df['Page'], errors='coerce')
     return df.sort_values(by="Page")
 

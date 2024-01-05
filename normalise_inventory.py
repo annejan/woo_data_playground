@@ -83,6 +83,7 @@ def normalize_id(series):
 
 
 def normalise_beoordeling(series):
+    series = series.astype(str)
     series = series.str.replace(";", ",", regex=False)
     return series.str.replace(r"\ben\b", ",", regex=True)
 
