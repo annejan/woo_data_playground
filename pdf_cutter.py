@@ -34,6 +34,7 @@ Requirements:
 import argparse
 import pandas as pd
 import pikepdf
+import re
 
 
 def parse_arguments():
@@ -50,8 +51,9 @@ def load_mappings(excel_path):
     """Load and sort the Excel file with document mappings."""
     df = pd.read_excel(excel_path, dtype={"DocumentID": str})
     df["Page"] = pd.to_numeric(df["Page"], errors="coerce")
-    return df.sort_values(by="Page")
-
+    df_gr = df.groupby("DocumentID", as_index=False)["Page"].min()
+    return df_gr.sort_values(by="Page").reset_index(drop=True)
+    
 
 def save_pages(pdf_writer, document_id):
     """Save the extracted pages to a new PDF file."""
@@ -59,6 +61,12 @@ def save_pages(pdf_writer, document_id):
     with open(output_filename, "wb") as output_pdf:
         pdf_writer.write(output_pdf)
     print(f"Created {output_filename}")
+
+
+def delete_leading_zeroes(inputString):
+   regexPattern = "^0+(?!$)"
+   outputString = re.sub(regexPattern, "", inputString)
+   return outputString
 
 
 def extract_and_save_pages(input_pdf, mappings):
@@ -84,8 +92,9 @@ def extract_and_save_pages(input_pdf, mappings):
         if pd.isna(end_page):
             end_page = len(input_pdf.pages) + 1
         end_page = int(end_page)
+        print(start_page, end_page)
         output_pdf.pages.extend(input_pdf.pages[start_page - 1 : end_page - 1])
-        output_filename = f"{row['DocumentID']}.pdf"
+        output_filename = delete_leading_zeroes(f"{row['DocumentID']}.pdf")
         output_pdf.save(output_filename, linearize=True)
         print(f"Created {output_filename}")
 
