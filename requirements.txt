@@ -3,7 +3,7 @@ PyMuPDFb==1.23.3
 openpyxl==3.1.2
 requests==2.32.0
 flair==0.12.2
-transformers==4.36.0
+transformers==4.38.0
 pandas==2.1.1
 asciichartpy==1.5.25
 tqdm==4.66.3
